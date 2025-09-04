@@ -23,4 +23,25 @@ public class Operator {
         System.out.println(3142.0 / 1000.0);
     }
 
+    public void OperatorEx4() {
+        int a = 5;
+        int b = 0;
+
+        if(a != 0 || ++b != 0) {
+            System.out.println("값은 참입니다.");
+        }
+
+        if(a == 5 || OperatorEx5()) {
+            System.out.println("두 번째 역시 참 입니다.");
+        }
+
+        System.out.printf("a = %d , b = %d \n", a, b);
+    }
+
+    public boolean OperatorEx5() {
+        System.out.println("메서드가 실행됩니다!!");
+
+        return true;
+    }
+
 }
