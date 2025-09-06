@@ -44,4 +44,36 @@ public class Operator {
         return true;
     }
 
+    public void OperatorEx6() {
+        int a = 0xABCD;
+        System.out.printf("%X \n" , a);
+
+        a = a >> 4;
+        System.out.printf("%X \n" , a);
+
+        a = a >> 4;
+        System.out.printf("%X \n" , a);
+
+        a = a >> 4;
+        System.out.printf("%X \n" , a);
+
+        a = 32;
+        System.out.println(a);
+
+        a = a >> 1;
+        System.out.println(a);
+
+        a = a >> 32;
+        System.out.println(a);
+
+        a = a >> 33;
+        System.out.println(a);
+    }
+
+    public void OperatorEx7() {
+        final int a;
+
+        a = 44;
+        // a = 55;
+    }
 }

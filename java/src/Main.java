@@ -1,8 +1,9 @@
 import c_operator.Operator;
+import d_statement.Statement;
 
 public class Main {
     public static void main(String[] args) {
-        Operator operator = new Operator();
-        operator.OperatorEx4();
+        Statement s = new Statement();
+        s.StatementEx1();
     }
 }
