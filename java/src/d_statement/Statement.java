@@ -35,4 +35,14 @@ public class Statement {
         }
     }
 
+    public void StatementEx3() {
+        for(int i = 1; i < 1; i++) {
+            System.out.println("실행되나?");
+        }
+
+        for(int i = 0; i < 5; i++) {
+            System.out.println("실행되니 : " + i);
+        }
+    }
+
 }
