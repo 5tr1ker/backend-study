@@ -40,8 +40,11 @@ public class Statement {
             System.out.println("실행되나?");
         }
 
-        for(int i = 0; i < 5; i++) {
-            System.out.println("실행되니 : " + i);
+        int i = 0;
+        for(System.out.println("테스트"); true ; System.out.println("헐")) {
+            if(i > 10) break;
+            i++;
+            System.out.println("실행되니 : ");
         }
     }
 
