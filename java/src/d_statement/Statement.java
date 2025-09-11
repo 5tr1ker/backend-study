@@ -48,4 +48,25 @@ public class Statement {
         }
     }
 
+    public void StatementEx4() {
+        int arr[] = {1,2,3,4,5};
+
+        for(int input : arr) {
+            System.out.println(input);
+        }
+
+        for(int i = 0; i < arr.length; i++) {
+            System.out.println(arr[i]);
+        }
+    }
+
+    public void StatementEx5() {
+        for(int i = 0; i < 5; i++) {
+            for(int j = 0; j <= i; j++) {
+                System.out.printf("*");
+            }
+            System.out.println();
+        }
+
+    }
 }
