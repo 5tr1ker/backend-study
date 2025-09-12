@@ -1,5 +1,7 @@
 package d_statement;
 
+import java.util.Scanner;
+
 public class Statement {
 
     public void StatementEx1() {
@@ -69,4 +71,40 @@ public class Statement {
         }
 
     }
+
+    public void StatementEx6() {
+        int i = 6;
+        while(--i!=0) {
+            System.out.println("카운트 다운 : " + i);
+
+            for(int j = 0; j <= 2_000_000_000; j++) ;
+
+        }
+
+        System.out.println("폭발!");
+    }
+
+    public void StatementEx7() {
+        int i = 0;
+        for( ; i < 5; i++);
+        {
+            System.out.println(i);
+        }
+    }
+
+    public void StatementEx8() {
+        Scanner scanner = new Scanner(System.in);
+        int input = Integer.parseInt(scanner.nextLine());
+
+        int sum = 0;
+        while(input > 0) {
+            int temp = input % 10;
+            sum += temp;
+
+            input /= 10;
+        }
+
+        System.out.println(sum);
+    }
+
 }
