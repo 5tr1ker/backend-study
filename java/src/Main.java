@@ -1,8 +1,8 @@
-import d_statement.Statement;
+import e_array.ArrayStudy;
 
 public class Main {
     public static void main(String[] args) {
-        Statement s = new Statement();
-        s.StatementEx9();
+        ArrayStudy s = new ArrayStudy();
+        s.arrayEx07();
     }
 }
