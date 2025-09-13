@@ -107,4 +107,23 @@ public class Statement {
         System.out.println(sum);
     }
 
+    public void StatementEx9() {
+        Loop1 : for(int i = 1; i <= 9; i++) {
+            System.out.printf("[ %d 단 ] \n", i);
+            for(int j = 1; j <= 9; j++) {
+                System.out.printf("%d x %d = %d \n", i , j , i*j);
+
+                if(i * j > 30) {
+                    //continue Loop1; // Loop #1
+                    break Loop1;
+                }
+
+                continue; // Loop #2
+                // break;
+            }
+        }
+
+        System.out.println("[출력 완료]");
+    }
+
 }
