@@ -1,5 +1,7 @@
 package e_array;
 
+import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 public class ArrayStudy {
@@ -66,6 +68,26 @@ public class ArrayStudy {
         System.arraycopy(arr, 0, temp, 2 , arr.length);
         System.out.println("TEMP : " + Arrays.toString(temp));
         System.out.println("ARR : " + Arrays.toString(arr));
+    }
+    
+    public void arrayEx08() {
+        char ch = '\u0000';
+
+        System.out.println(ch);
+    }
+
+    public void arrayEx09() {
+        String[] name = new String[10];
+        name[0] = "Park";
+        name[1] = "Sang";
+        name[2] = "Jin";
+
+        String[] age = new String[] {"a" , "b" , "C"};
+        String[] c = {"1" , "2" , "#"};
+
+
+
+        System.out.println(Arrays.toString(name));
     }
 
 }
