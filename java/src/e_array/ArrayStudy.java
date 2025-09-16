@@ -90,4 +90,77 @@ public class ArrayStudy {
         System.out.println(Arrays.toString(name));
     }
 
+    public void arrayEx10() {
+        String str = "this is java";
+        char[] arr = str.toCharArray();
+        String newStr = new String(arr);
+
+        System.out.println(arr);
+        System.out.println(newStr);
+    }
+
+    public void arrayEx11(String[] args) {
+        for(String input : args) {
+            System.out.println("입력 : " + input);
+        }
+    }
+
+    public void arrayEx12() {
+        int[][] arr = new int[4][3];
+        int[][] arr_1 = new int[][] {{1} , {2} , {3}};
+        int[][] arr_2 = {{1,2,3} , {4,5,6} , {7,8,9}};
+
+        for (int i = 0; i < arr_1.length; i++) {
+            for (int j = 0; j < arr_1[i].length; j++) {
+                System.out.printf("%d" , arr_1[i][j]);
+            }
+            System.out.println();
+        }
+
+        for (int i = 0; i < arr_2.length; i++) {
+            for (int j = 0; j < arr_2[i].length; j++) {
+                System.out.printf("%d" , arr_2[i][j]);
+            }
+            System.out.println();
+        }
+    }
+
+    public void arrayEx13() {
+        int arr[][] = new int[5][];
+        arr[0] = new int[4];
+        arr[1] = new int[2];
+        arr[2] = new int[7];
+        arr[3] = new int[6];
+        arr[4] = new int[9];
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[i].length; j++) {
+                System.out.printf("%d" , arr[i][j]);
+            }
+            System.out.println();
+        }
+    }
+
+    public void arrayEx14() {
+        int arr[][] = {
+                {1,2,3},
+                {4,5},
+                {6,7,8,9},
+                {0},
+                {}
+        };
+
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[i].length; j++) {
+                System.out.printf("%d" , arr[i][j]);
+            }
+            System.out.println();
+        }
+
+        for(int []input : arr) {
+            for(int value : input) {
+                System.out.print(value);
+            }
+        }
+    }
+
 }
