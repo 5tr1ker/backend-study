@@ -1,8 +1,9 @@
 import e_array.ArrayStudy;
+import f_oop.OOP;
 
 public class Main {
     public static void main(String[] args) {
-        ArrayStudy s = new ArrayStudy();
-        s.arrayEx14();
+        OOP oop = new OOP();
+        oop.oopEx01();
     }
 }
