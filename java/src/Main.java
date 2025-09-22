@@ -4,6 +4,6 @@ import f_oop.OOP;
 public class Main {
     public static void main(String[] args) {
         OOP oop = new OOP();
-        oop.oopEx01();
+        oop.oopEx02();
     }
 }

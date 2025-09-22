@@ -23,4 +23,32 @@ public class OOP {
         }
     }
 
+    class Card {
+        String kind;
+        int number;
+        static int width;
+        static int height;
+    }
+
+    public void oopEx02() {
+        Card c1 = new Card();
+        Card c2 = new Card();
+
+        Card.width = 200;
+        Card.height = 300;
+
+        c1.kind = "Heart";
+        c1.number = 5;
+        c2.kind = "Club";
+        c2.number = 3;
+        System.out.println("c1의 경우 width : " + c1.width + " height : " + c1.height + " kind : " + c1.kind + " number : " + c1.number);
+        System.out.println("c2의 경우 width : " + c2.width + " height : " + c2.height + " kind : " + c2.kind + " number : " + c2.number);
+
+        c1.width = 65535;
+        c2.height = 12345;
+
+        System.out.println("c1의 경우 width : " + c1.width + " height : " + c2.height + " kind : " + c1.kind + " number : " + c1.number);
+        System.out.println("c2의 경우 width : " + c2.width + " height : " + c2.height + " kind : " + c2.kind + " number : " + c2.number);
+    }
+
 }
