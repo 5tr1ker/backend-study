@@ -51,4 +51,28 @@ public class OOP {
         System.out.println("c2의 경우 width : " + c2.width + " height : " + c2.height + " kind : " + c2.kind + " number : " + c2.number);
     }
 
+    public void oopEx03() {
+        int result = add(5,6);
+
+        System.out.println(result);
+    }
+
+    private int add(int a, int b) {
+        return a + b;
+    }
+
+    public void oopEx04() {
+        double result = addLong(30,-5);
+
+        System.out.println(result);
+    }
+
+    private long addLong(long a, long b) {
+        return a + b;
+    }
+
+    public static void testMethod() {
+        // oopEx03(); 호출 불가능
+    }
+
 }
