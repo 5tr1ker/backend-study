@@ -75,4 +75,18 @@ public class OOP {
         // oopEx03(); 호출 불가능
     }
 
+    public int oopEx05() {
+
+        // return; // 컴파일러에 의해 제공
+        return add(3 , 5);
+    }
+
+    public int oopEx06(int input) {
+        if(input > 0) {
+            return 5;
+        } else {
+            return 10;
+        }
+    }
+
 }

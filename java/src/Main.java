@@ -3,6 +3,6 @@ import f_oop.OOP;
 public class Main {
     public static void main(String[] args) {
         OOP oop = new OOP();
-        oop.oopEx04();
+        System.out.println(oop.oopEx06(-5));
     }
 }
