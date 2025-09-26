@@ -89,4 +89,59 @@ public class OOP {
         }
     }
 
+    public void oopEx07() {
+        Car car = new Car();
+
+        car.horsePower = 520;
+        car.carNeme = "BMW M4";
+        car.cc = 3000;
+
+        System.out.println(car.carNeme + " : " + car.cc + " : " + car.horsePower);
+
+        oopEx08(car);
+
+        System.out.println(car.carNeme + " : " + car.cc + " : " + car.horsePower);
+    }
+
+    private void oopEx08(Car car) {
+        car.horsePower = 80;
+        car.carNeme = "KIA RAY";
+        car.cc = 1000;
+    }
+
+    public void oopEx09() {
+        Car car = new Car();
+
+        car.horsePower = 520;
+        car.carNeme = "BMW M4";
+        car.cc = 3000;
+        System.out.println(car.carNeme + " : " + car.cc + " : " + car.horsePower);
+
+        oopEx10(car.cc , car.horsePower);
+
+        System.out.println(car.carNeme + " : " + car.cc + " : " + car.horsePower);
+    }
+
+    private void oopEx10(int cc, int horsePower) {
+        cc = 123;
+
+        horsePower = 567;
+    }
+
+    public void oopEx11() {
+        Car car = oopEx12();
+
+        System.out.println(car.carNeme + " : " + car.cc + " : " + car.horsePower);
+    }
+
+    private Car oopEx12() {
+        Car car = new Car();
+
+        car.horsePower = 125;
+        car.carNeme = "aefase";
+        car.cc = 123;
+
+        return car;
+    }
+
 }
