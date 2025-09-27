@@ -2,6 +2,8 @@ package f_oop;
 
 public class OOP {
 
+    public static String writer = "sjpark";
+
     class Car {
         String carNeme;
         int horsePower;
@@ -144,4 +146,22 @@ public class OOP {
         return car;
     }
 
+    public int recursive(int n){
+        if(n < 0) return n;
+        return n + recursive(n - 1);
+    }
+
+    public int banbokmoon(int n) {
+        int result = 0;
+
+        for(int i = 0; i < n; i++) {
+            result += i;
+        }
+
+        return result;
+    }
+
+    public static void oopEx14() {
+        System.out.println("callcall");
+    }
 }
