@@ -1,6 +1,6 @@
 package f_oop;
 
-public class OOP_5 {
+public class Car {
 
     int sunLoop = 5115;
     public int door = 4; // 명시적 초기화
@@ -12,8 +12,11 @@ public class OOP_5 {
         System.out.println("instance {}");
     }
 
-    public OOP_5() {
+    public Car() {
         System.out.println("constructor");
     }
 
+    public void print() {
+        System.out.println("print_oop_5");
+    }
 }
