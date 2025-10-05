@@ -13,7 +13,12 @@ public class Car {
     }
 
     public Car() {
-        System.out.println("constructor");
+        System.out.println("CAR 기본 constructor");
+    }
+
+    public Car(int sunLoop) {
+        System.out.println("constructor {sunloop}");
+        this.sunLoop = sunLoop;
     }
 
     public void print() {
