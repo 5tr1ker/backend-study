@@ -2,8 +2,8 @@ package f_oop;
 
 public class KIA extends Car {
 
-    public int engineSize = 50;
-    public int sunLoop = 0;
+    private int engineSize = 50;
+    private int sunLoop = 0;
 
     public KIA(int sunLoop) {
         // super(sunLoop);
@@ -18,5 +18,21 @@ public class KIA extends Car {
     public void print() {
         System.out.println("print_oop_6");
         System.out.println(super.sunLoop);
+    }
+
+    public int getEngineSize() {
+        return engineSize;
+    }
+
+    public void setEngineSize(int engineSize) {
+        this.engineSize = engineSize;
+    }
+
+    public int getSunLoop() {
+        return sunLoop;
+    }
+
+    public void setSunLoop(int sunLoop) {
+        this.sunLoop = sunLoop;
     }
 }

@@ -2,8 +2,8 @@ package f_oop;
 
 public class Car {
 
-    int sunLoop = 5115;
-    public int door = 4; // 명시적 초기화
+    private int sunLoop = 5115;
+    private int door = 4; // 명시적 초기화
     static {
         System.out.println("static {}");
     }
@@ -23,5 +23,21 @@ public class Car {
 
     public void print() {
         System.out.println("print_oop_5");
+    }
+
+    public int getSunLoop() {
+        return sunLoop;
+    }
+
+    public void setSunLoop(int sunLoop) {
+        this.sunLoop = sunLoop;
+    }
+
+    public int getDoor() {
+        return door;
+    }
+
+    public void setDoor(int door) {
+        this.door = door;
     }
 }
