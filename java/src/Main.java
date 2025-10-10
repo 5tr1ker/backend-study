@@ -1,4 +1,4 @@
-import f_oop.BMW;
+import f_oop.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -7,6 +7,18 @@ public class Main {
         // 코드 작성 시작
 
         // BMW bmw = new BMW(); private 생성자
+        Parent parent = new Parent();
+        parent.print();
+        System.out.println(parent.index);
+
+        parent = new Child();
+        parent.print();
+        System.out.println(parent.index);
+
+        Child child = new Child();
+        child.print();
+        System.out.println(child.index);
+
         // 코드 작성 끝
 
         long end = System.currentTimeMillis();

@@ -446,3 +446,4 @@ Class Time{
 	ㄴ abstract 메서드는 자손 클래스에서 확장되어야 하는데, private는 자손에서 접근할 수 없다.
 4. 메서드는 private와 final을 같이 사용할 필요가 없다.
 	ㄴ private 메서드는 오바라이딩될 수 없기 때문이다.
+	

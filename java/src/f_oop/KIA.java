@@ -17,7 +17,7 @@ public class KIA extends Car {
 
     public void print() {
         System.out.println("print_oop_6");
-        System.out.println(super.sunLoop);
+        System.out.println(super.getSunLoop());
     }
 
     public int getEngineSize() {
