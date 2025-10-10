@@ -19,6 +19,9 @@ public class Main {
         child.print();
         System.out.println(child.index);
 
+        Unit unit = new Marine();
+        unit.move();
+
         // 코드 작성 끝
 
         long end = System.currentTimeMillis();
