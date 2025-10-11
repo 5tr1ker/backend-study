@@ -19,8 +19,14 @@ public class Main {
         child.print();
         System.out.println(child.index);
 
+        // 추상 클래스의 다형성
         Unit unit = new Marine();
         unit.move();
+
+        // 인터페이스의 다형성
+        // InterfaceStudy -> 인터페이스
+        // InterfaceImplements -> 구현체
+        InterfaceStudy is1 = new InterfaceImplements();
 
         // 코드 작성 끝
 

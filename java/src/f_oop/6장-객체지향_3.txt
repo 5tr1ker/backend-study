@@ -82,3 +82,68 @@ abstract void method();
 # 상속계층도를 내려갈수록 클래스가 구체화되는 것을 볼 수 있고, 반대로 올라갈 수록 추상화의 정도가 심해진다는 것을 알 수 있다.
 # 따라서 추상클래스를 사용하는 이유는 여러 클래스들의 공통 부분을 추출하여 추상화하기 위해 사용한다고 볼 수 있다.
 # 추상 : 개념에서 공통적인 성질을 뽑아 이를 일반적인 개념으로 파악하는 활동
+
+[ 인터페이스 ]
+인터페이스는 일종의 추상 클래스이며, 추상 클래스보다 추상화 정도가 더 높아서 추상 메서드와 상수만 선언할 수 있다.
+즉, 몸통을 가진 메서드와 멤버 변수를 가질 수 없다.
+
+# 즉 인터페이스와 추상 클래스는 추상적인 개념을 설계한다. 여기서 인터페이스는 추상 클래스보다 더 추상적인 개념을 가진다.
+# 상속 계층도를 따라 올라갈 수록 추상적인 개념이 많아지는데, 이는 인터페이스가 더 많아질 수 있다.
+# 추상 클래스는 부분만 완성된 "미완성 설계도"라고 한다면, 인터페이스는 아무것도 없고 밑그림만 그려져있는 "기본 설계도"라고 할 수 있다.
+인터페이스 역시 완성된 설계도가 아니기 때문에 인스턴스를 생성할 수 없다.
+
+인터페이스를 작성할 때는 class 대신에 interface를 붙여주면 되고 public 또는 default를 붙일 수 있다.
+인터페이스에 작성되는 멤버는 다음과 같은 제약 사항이 있다.
+1. 모든 멤버변수는 public static final 이어야 하며 생략할 수 있다.
+2. 모든 메서드는 public abstract 이어야 하며 생략할 수 있다.
+	ㄴ 단 static 메서드와 디폴트 메서드는 예외 ( JDK 1.8 이상 )
+모든 멤버에 예외없이 적용되기 때문에 제어자를 생략할 수 있으며, 생략 시 컴파일러가 컴파일 시에 추가해준다.
+
+public interface InterfaceStudy {
+    int value = 30;
+    int key = 16;
+
+    void print();
+    void walk();
+}
+
+public interface AnotherInterface extends InterfaceStudy{
+}
+
+이때 인터페이스는 다중상속이 가능하다.
+인터페이스를 상속받는 인터페이스는 extends 키워드를 통해 상속을 받는다.
+
+- 인터페이스의 구현
+인터페이스는 해당 인터페이스를 구현하는 클래스에 대해 implements 키워드를 활용하여 상속을 한다.
+public class InterfaceImplements extends Car implements InterfaceStudy {
+
+    @Override
+    public void print() {
+
+    }
+
+    @Override
+    public void walk() {
+
+    }
+}
+
+만약 인터페이스에 있는 추상 메서드 중 일부만 구현한다면 해당 클래스를 abstract 클래스로 선언해야 하며,
+위의 예제와 같이 implements 와 extends 를 동시에 할 수 있다.
+
+# extends는 확장 한다는 의미이며, implements 는 구현한다는 의미를 가지고 있다.
+
+# 인터페이스의 이름은 able ( ~을 할 수 있는 ) 로 끝나는 경우가 많다, 그 이유는 특정 행위를 하는데 필요한 메서드를 제공한다는 의미를 강조하기 위해서이며,
+# 해당 인터페이스를 구현할 경우 ~을 할 수 있는 능력을 갖추었다는 의미를 갖는다.
+# ex ) public interface Fightable { void attack(); void walk(); }
+
+그리고 인터페이스도 다형성의 특성을 활용해 인터페이스 참조 변수에 해당 인터페이스의 구현체의 인스턴스를 참조할 수 있다.
+// InterfaceStudy -> 인터페이스
+// InterfaceImplements -> 구현체
+InterfaceStudy is1 = new InterfaceImplements();
+
+InterfaceStudy method(InterfaceStudy study) {
+	return new InterfaceImplements();
+}
+위의 코드는 매개 변수와 반환 타입이 모두 인터페이스이다.
+이것은 인자로 해당 인터페이스를 구현한 클래스의 인스턴스를 넘겨받아야 하며, 반환값으로는 해당 인터페이스를 구현한 클래스의 인스턴스를 반환한다는 뜻이다.
