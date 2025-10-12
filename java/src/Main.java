@@ -1,4 +1,7 @@
 import f_oop.*;
+import f_oop.interfacestudy.CarManager;
+import f_oop.interfacestudy.K5;
+import f_oop.interfacestudy.Sonata;
 
 public class Main {
     public static void main(String[] args) {
@@ -27,6 +30,12 @@ public class Main {
         // InterfaceStudy -> 인터페이스
         // InterfaceImplements -> 구현체
         InterfaceStudy is1 = new InterfaceImplements();
+
+        // 인터페이스의 공통 묶기
+        CarManager cm = new CarManager();
+        cm.carManager(new K5());
+        cm.carManager(new Sonata());
+
 
         // 코드 작성 끝
 
