@@ -19,6 +19,11 @@ public class Sonata extends CarTemplate implements Moveable , KIA , Nav {
     }
 
     @Override
+    public void help() {
+        KIA.super.help();
+    }
+
+    @Override
     public void on() {
         nav.on();
     }

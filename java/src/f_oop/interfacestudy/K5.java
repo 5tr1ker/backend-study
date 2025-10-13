@@ -19,6 +19,11 @@ public class K5 extends CarTemplate implements Moveable , KIA , Nav {
     }
 
     @Override
+    public void help() {
+        Moveable.super.help();
+    }
+
+    @Override
     public void on() {
         nav.on();
     }

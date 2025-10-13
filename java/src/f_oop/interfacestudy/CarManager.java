@@ -10,6 +10,8 @@ public class CarManager {
             sonata.move();
             sonata.on();
             sonata.off();
+            sonata.help();
+            sonata.booster();
         }
         else if(kia instanceof K5) {
             System.out.println("K5 클래스가 호출되었습니다.");
@@ -17,6 +19,8 @@ public class CarManager {
             k5.move();
             k5.on();
             k5.off();
+            k5.help();
+            k5.booster();
         }
     }
 

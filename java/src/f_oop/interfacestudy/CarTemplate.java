@@ -14,4 +14,8 @@ public abstract class CarTemplate {
         return "engine : " + engine + " name : " + name;
     }
 
+    public void booster() {
+        System.out.println("CarTemplate 부스터");
+    }
+
 }
