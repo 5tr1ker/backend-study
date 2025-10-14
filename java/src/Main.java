@@ -1,4 +1,5 @@
 import f_oop.*;
+import f_oop.innerclass.InnerClassStudy;
 import f_oop.interfacestudy.CarManager;
 import f_oop.interfacestudy.K5;
 import f_oop.interfacestudy.Sonata;
@@ -36,6 +37,11 @@ public class Main {
         cm.carManager(new K5());
         cm.carManager(new Sonata());
 
+        // 내부 클래스 선언
+        System.out.println("내부 클래스");
+        InnerClassStudy innerClassStudy = new InnerClassStudy(); // 외부 클래스
+        InnerClassStudy.InnerClass ic = innerClassStudy.new InnerClass();
+        ic.method2();
 
 
         // 코드 작성 끝
