@@ -1,4 +1,6 @@
-import f_oop.*;
+package f_oop;
+
+import f_oop.anonymous.Anonymous;
 import f_oop.innerclass.InnerClassStudy;
 import f_oop.interfacestudy.CarManager;
 import f_oop.interfacestudy.K5;
@@ -44,6 +46,9 @@ public class Main {
         ic.method2();
 
 
+        // 익명 클래스
+        Anonymous an = new Anonymous();
+        an.run();
         // 코드 작성 끝
 
         long end = System.currentTimeMillis();
