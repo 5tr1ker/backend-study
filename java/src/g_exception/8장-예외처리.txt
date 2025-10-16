@@ -15,3 +15,71 @@
 - 에러(error) : 메모리 부족 (OutOfMemoryError) 와 스택오버플러우(StackOverFlowError) 와 같이 발생하면 복구할 수 없는 심각한 오류
 - 예외(exception) : 발생하더라도 수습할 수 있는 비교적 덜 심각한 오류
 에러(error) 는 프로그램이 종료되는 것을 막을 수 없지만, 예외 ( exception ) 은 프로그램이 종료되는 것을 코드로 막을 수 있다.
+
+자바에서는 예외가 발생할 수 있는 오류 ( Exception 과 Error ) 를 클래스로 정의하였으며, 이러한 클래스들도 최고 조상은 Object 클래스이다.
+Object < Throwable < Exception < RuntimeException
+					< Error	< OutOfMemoryError
+
+예외 클래스들은 두 그룹으로 묶을 수 있다.
+1. Exception 클래스와 그 자손들 ( IOException , ClassNotFountException 등등.. )
+2. RuntimeException 클래스와 그 자손들 ( ArithmeticException, NullPointException 등등.. )
+
+RuntimeException 클래스와 그 자손은 주로 프로그래머의 실수에 의해서 발생할 수 있는 예외들로 자바의 프로그래밍과 관계가 깊다.
+	ㄴ 예를 들면 존재하지 않는 파일을 읽거나 ( FileNotFoundException ) , 값이 null인 참조변수를 조회한다거나 ( NullPointException ) , 정수를 0 으로 나누든가 ( ArithmeticException )에 해당한다.
+	
+Exception 클래스와 그 자손들은 주로 외부의 영향에 의해서 발생할 수 있으며, 프로그램 사용자들의 동작에 의해 발생할 수 있다.
+	ㄴ 예를 들면 존재 하지 않는 파일을 입력했거나 ( FileNotFoundException ) , 데이터를 잘못 입력했다던가 ( DataFormatException ) 에 해당한다.
+	
+# 정리
+# Exception 클래스와 자손 클래스 : 사용자의 실수 등, 외적인 요인에 의해 발생하는 예외
+# RuntimeException 클래스와 자손 클래스 : 프로그래머의 실수로 인해서 발생할 수 있는 예외
+
+[ 예외처리 try - catch ]
+프로그램 실행 중 발생하는 에러는 어쩔 수 없지만, 예외같은 경우는 프로그래머가 대비를 할 수 있다.
+
+예외 처리란? 프로그램 실행 도중 발생할 수 있는 예외에 대비한 코드를 작성하는 것이다.
+예외 처리의 목적은? 예외의 발생으로 프로그램의 비 정상적인 종료를 막고, 정상적인 상태를 유지하기 위해서이다.
+
+발생한 예외를 처리하지 못하면, 프로그램은 비정상적으로 종료되며 처리되지 못한 예외 ( uncaught exception ) 는 JVM의 예외 처리기 ( UncaughtExceptionHandler ) 가 예외의 원인을 화면에 출력한다.
+
+try {
+
+} catch (Exception e) {
+
+} catch (Exception2 e) {
+}...
+위의 예제는 예외 처리를 위한 try-catch의 예제이다.
+하나의 try 블록 다음엔 여러 종류의 Exception을 처리하기 위한 catch 블록이 1개 이상 올 수 있으며, 이중 발생한 예외와 일치하는 단 하나의 catch 블록만 실행된다.
+만약 발생한 예외와 일치하는 Exception이 없을 경우 처리되지 않는다.
+
+public void method1() {
+        try {
+            try {
+
+            } catch (Exception e) {
+
+            }
+        } catch (Exception e) {
+            try {
+
+            } catch (Exception ex) { // 이름 중복
+
+            }
+        }
+
+        try {
+
+        } catch (Exception e) {
+
+        }
+    }
+위의 예제는 try - catch 의 예제이다.
+한 메서드에 여러 개의 try- catch 를 사용할 수 있고, 각 블록 내에서도 try - catch 를 사용할 수 있다.
+다만 catch 블록 안에 참조 변수의 이름이 중복되지 않게만 조심하면 된다.
+
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+	at g_exception.TryCatchTest.method2(TryCatchTest.java:40)
+	at g_exception.Main.main(Main.java:7)
+
+위의 메세지는 실제로 예외가 발생했을 때의 메세지이다. 예외가 발생했을 때 발생 원인과 예외가 발생한 위치를 알 수 있다.
+0으로 나눈 ArithmeticException 예외와 TryCatchTest 클래스의 40번째 줄에서 오류가 발생했다는 것을 알 수 있다.
