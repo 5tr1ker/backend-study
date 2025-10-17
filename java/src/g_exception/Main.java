@@ -4,7 +4,7 @@ public class Main {
 
     public static void main(String[] args) {
         TryCatchTest tct = new TryCatchTest();
-        tct.method2();
+        tct.method3();
     }
 
 }

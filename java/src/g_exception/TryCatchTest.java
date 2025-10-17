@@ -40,4 +40,36 @@ public class TryCatchTest {
             System.out.println(number / index);
         }
     }
+
+    public void method3() {
+        try {
+            System.out.println(0);
+            System.out.println(1);
+            System.out.println(0/0);
+            System.out.println(2);
+        } catch (ArithmeticException e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println(3);
+        } catch (Exception e){
+            System.out.println(4);
+        }
+        System.out.println(5);
+    }
+
+    public void method4() {
+        try {
+            System.out.println(0);
+            System.out.println(1);
+            System.out.println(0/0);
+            System.out.println(2);
+        } catch (Exception e){
+            if(e instanceof ArithmeticException){
+                System.out.println("ArithmeticException !_!");
+            }
+            System.out.println(3);
+            System.out.println(4);
+        }
+        System.out.println(6);
+    }
 }
