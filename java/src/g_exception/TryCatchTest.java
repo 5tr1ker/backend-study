@@ -1,5 +1,7 @@
 package g_exception;
 
+import java.io.IOException;
+
 public class TryCatchTest {
 
     public void method1() {
@@ -72,4 +74,35 @@ public class TryCatchTest {
         }
         System.out.println(6);
     }
+
+    public void method5() {
+        try {
+            System.out.println("hello");
+
+            method6();
+        } catch (ArithmeticException | IOException e){
+            System.out.println(e.getClass().getName());
+
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void method6() throws ArithmeticException, IOException {
+        ArithmeticException e = new ArithmeticException("arithmeticException 발생하였습니다.");
+
+        throw e;
+    }
+
+    private void method07() {
+        throw new RuntimeException();
+    }
+
+//    private void method08() {
+//        throw new Exception();
+//    }
+
+    public void method08() throws RuntimeException , ArithmeticException {
+
+    }
+
 }
