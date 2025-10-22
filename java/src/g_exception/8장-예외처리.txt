@@ -197,3 +197,49 @@ public void method08() throws RuntimeException , ArithmeticException {
 
 이렇게 메서드에 예외를 선언하면 해당 메서드를 사용하기 위해서 어떤 예외들을 처리해야 하는지 쉽게 알 수 있다.
 또한 메서드 내에서 발생할 수 있는 예외를 처리하도록 강요하기 때문에 견고한 프로그램을 만들 수 있다.
+
+public final void wait() throws InterruptedException
+위의 메서드는 Object 클래스에 선언된 메서드이다.
+이 메서드의 선언 부를 보면 해당 메서드는 InterruptedException 예외가 발생할 수 있으니, 예외 처리를 해주어야 한다는 것이다.
+# 단 InterruptedException 예외는 Exception 클래스의 자손이므로 예외를 처리하거나 throws 로 선언한다.
+
+RuntimeException 의 자손 클래스는 예외 처리를 하지 않아도 되기 때문에 throws 로 선언하지 않아도 된다.
+# throws 에 선언해도 큰 문제는 없지만, 보통 반드시 처리해야 하는 예외 클래스만 선언한다.
+
+그리고 throws 로 선언을 할 경우 예외 처리를 하는 것이 아니라, 자신을 호출한 클래스에게 예외를 떠넘기는 것이다.
+그렇기 때문에 예외가 발생했을 때 자신을 호출한 메서드는 예외를 처리하거나 ( try-catch ) 또 예외를 던져야 ( throws ) 한다.
+# 만약 main 메서드까지 거슬러 올라가면서 예외가 처리되지 않았을 경우 프로그램은 종료된다.
+
+그러면 언제 자체적으로 처리 ( try-catch ) 하고, 언제 예외를 선언하는 것이 좋을까?
+만약 예외가 발생한 메서드 내부에서 처리해도 되는 경우는 메서드 내 try-catch를 활용하고, 메서드 호출 시 넘겨받아야 하는 값을 다시 받아야 하는 경우 예외를 선언해서 외부에서 다시 처리하게 한다.
+
+또한 예외가 발생하면 오류 스택 메세지를 통해 알 수 있는 메세지가 있다.
+Exception in thread "main" java.lang.Exception
+	at g_exception.TryCatchTest.method10(TryCatchTest.java:113)
+	at g_exception.TryCatchTest.method09(TryCatchTest.java:109)
+	at g_exception.TryCatchTest.method08(TryCatchTest.java:105)
+	at g_exception.Main.main(Main.java:7)
+	
+위의 메세지를 보면 예외가 발생했을 때 호출 스택의 내용을 알 수 있으며, 보면 main 메서드가 method08 를 호출하고, method08이 method09를 호출하고, 마지막으로 method10 을 호출한다.
+이때 method10에서 Exception 예외가 발생하여 프로그램이 비 정상적으로 종료되었다.
+# 물론 try-catch 없이 예외를 선언하기만 해서 비정상적으로 종료된 것이다.
+
+    public void method11() {
+        try {
+            method09();
+        } catch (Exception e) {
+            System.out.println("예외를 잡았습니다.");
+            e.printStackTrace();
+        }
+    }
+	
+물론 다음과 같이 예외를 선언하지만 하지 않고, try-catch를 통해 처리를 해준다면 프로그램이 비 정상적으로 종료되는 일은 없다.
+메세지 :
+예외를 잡았습니다.
+java.lang.Exception
+	at g_exception.TryCatchTest.method10(TryCatchTest.java:113)
+	at g_exception.TryCatchTest.method09(TryCatchTest.java:109)
+	at g_exception.TryCatchTest.method11(TryCatchTest.java:118)
+	at g_exception.Main.main(Main.java:7)
+
+위의 메세지는 예외에 대한 메세지는 발생하고 있지만, 프로그램이 비정상적으로 종료된 것이 아니라, 단순히 e.printStackTrace() 를 통해 예외 발생 시점의 호출 스택을 출력한 것 뿐이다.

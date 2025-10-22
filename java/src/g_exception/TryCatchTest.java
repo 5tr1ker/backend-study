@@ -101,8 +101,25 @@ public class TryCatchTest {
 //        throw new Exception();
 //    }
 
-    public void method08() throws RuntimeException , ArithmeticException {
+    public void method08() throws Exception {
+        method09();
+    }
 
+    public void method09() throws Exception {
+        method10();
+    }
+
+    public void method10() throws Exception {
+        throw new Exception();
+    }
+
+    public void method11() {
+        try {
+            method09();
+        } catch (Exception e) {
+            System.out.println("예외를 잡았습니다.");
+            e.printStackTrace();
+        }
     }
 
 }
