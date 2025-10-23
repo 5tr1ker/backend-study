@@ -122,4 +122,18 @@ public class TryCatchTest {
         }
     }
 
+    public void method12(boolean flag) {
+        try {
+            System.out.println("1번쨰");
+            if(flag) throw new Exception();
+            return;
+        } catch (Exception e) {
+            System.out.println("3번째");
+            return;
+        } finally {
+            System.out.println("2번째");
+
+        }
+    }
+
 }

@@ -243,3 +243,104 @@ java.lang.Exception
 	at g_exception.Main.main(Main.java:7)
 
 위의 메세지는 예외에 대한 메세지는 발생하고 있지만, 프로그램이 비정상적으로 종료된 것이 아니라, 단순히 e.printStackTrace() 를 통해 예외 발생 시점의 호출 스택을 출력한 것 뿐이다.
+
+[ finally 블럭 ]
+finally 블록은 try-catch 문가 함께 사용되며, 예외 발생 여부에 관계없이 항상 실행된다.
+try-catch 블록문의 끝에 선택적으로 붙일 수 있으며 try -> catch -> finally 순으로 실행된다.
+# 만약 예외가 발생하지 않는다면 try -> finally 순으로 실행된다.
+
+finally 블록은 try문와 catch 문 안에 공통된 코드가 있을 경우 finally 코드로 뺄 수 있다.
+# 즉 try 블록안에도 수행되고, catch 문 안에도 수행되는 경우에 예외에 관계없이 항상 수행되어야 한다는 뜻이다.
+
+try {
+
+} catch () {
+
+} finally {
+
+}
+
+만약 try 블록이나 catch 블록에서 return 문이 수행되었다 하더라도 finally 문장을 먼저 수행한 다음에 메서드를 종료한다.
+    public void method12(boolean flag) {
+        try {
+            System.out.println("1번쨰");
+            if(flag) throw new Exception();
+            return;
+        } catch (Exception e) {
+            System.out.println("3번째");
+            return;
+        } finally {
+            System.out.println("2번째");
+
+        }
+    }
+# 위의 문장은 return문을 만났지만 finally의 블록은 항상 실행된다.
+
+[ 자동 자원 반환 try - with - resources ]
+JDK1.7 부터는 try-with-resources 라는 try-catch 문의 변형이 새로 등장했으며, 이 구문은 주로 입출력 관련 클래스들을 다룰 때 유용하다.
+보통 입출력 클래스들은 사용한 후에 꼭 닫아 주어야 한다.
+try {
+	dis = new DataInputStream(new FileInputStream("~~"))
+} catch (Exception io) {
+} finally {
+	dis.close();
+}
+
+위의 코드는 예외의 관계 없이 입출력 클래스를 닫는 코드가 있지만, 문제는 dis.close() 에서도 예외가 발생할 수 있다.
+문제는 finally 블록 안에서 예외 처리를 할 경우에 코드의 가독성이 떨어지는 문제가 있다.
+또한 try 블록과 finally 블록에서 모두 예외가 발생하면 기존 try 블록의 예외는 무시되는 문제도 있다. ( 즉 try 예외는 사라지게 되고, finally 에 있는 예외 정보만 알게 될 것이다.. )
+
+
+        try(FileInputStream fis = new FileInputStream("wow.txt");
+            DataInputStream dis = new DataInputStream(fis)) {
+
+            while(true) {
+                score += dis.readInt();
+            }
+
+        } catch (EOFException e) {
+            System.out.println("파일 조회 끝 : " + score);
+        } catch (IOException e) {
+            System.out.println("예외 발생");
+        }
+위의 예제는 try-with-resources 의 예제이다. try 블록안에 객체를 생성하는 문장을 넣으면, 해당 객체가 close() 를 호출하지 않아도, try 문을 벗어나면 자동으로 close() 가 호출된다.
+그 다음 catch 블록이나 finally 블록이 실행된다.
+
+다만 자동으로 객체의 자원을 해제하는 close()가 호출될 수 있으려면, 해당 클래스는 AutoCloseable 이라는 인터페이스를 구현한 것이어야 한다.
+
+        try(TryWithResources twr = new TryWithResources())  {
+            System.out.println("try-with-resource 실행");
+            twr.method02(true);
+        } catch (Exception e) {
+            System.out.println("종료..");
+            e.printStackTrace();
+        }
+		
+		
+public class TryWithResources implements AutoCloseable {
+
+    public void method02(boolean flag) throws Exception {
+        System.out.println("메서드가 호출되었습니다.");
+
+        if(flag)
+            throw new Exception("예외가 발생하였습니다.. ;ㅅ;");
+
+    }
+
+    @Override
+    public void close() throws Exception {
+        System.out.println("Close 가 호출되었습니다.");
+        throw new Exception("이또한 예외가 발생했네요..");
+    }
+}
+
+java.lang.Exception: 예외가 발생하였습니다.. ;ㅅ;
+	at g_exception.TryWithResources.method02(TryWithResources.java:32)
+	at g_exception.Main.main(Main.java:16)
+	Suppressed: java.lang.Exception: 이또한 예외가 발생했네요..
+		at g_exception.TryWithResources.close(TryWithResources.java:39)
+		at g_exception.Main.main(Main.java:14)
+		
+위의 예제를 실행한 결과이다. 위의 메세지는 두 예외가 동시에 발생할 수 없기 떄문에 실제 발생한 예외 메서드를 method02 으로 두고, close에서 발생한 예외를 억제된 예외로 다뤄지고 있다.
+만약 일반 try-catch 를 썼다면 method02 의 예외는 사라지고 close() 만 남게될 것이다.
+
