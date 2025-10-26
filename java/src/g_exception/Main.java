@@ -22,7 +22,7 @@ public class Main {
         ExceptionReThrow et = new ExceptionReThrow();
         et.method01();
 
-        System.out.println(et.method05());
+        System.out.println(et.method07());
 
     }
 

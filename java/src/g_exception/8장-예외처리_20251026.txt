@@ -410,3 +410,46 @@ public class CustomException extends Exception {
 또한 finally 블록에서도 return문을 사용할 수 있으며, try블록과 catch 블록의 return이 수행되고 나서 finally의 return문이 수행된다.
 최종적으론 finally의 return문이 수행된다.
 즉, 위의 예제는 3을 최종적으로 반환한다.
+
+[ 연결된 예외 ]
+한 예외는 다른 예외를 던질 수 있다. 이때 A예외가 B예외를 던질 경우, A는 B의 원인 예외 ( cause Eception ) 이라고 한다.
+이렇게 예외를 그냥 처리하지 않고 원인 예외를 등록 후 다시 던지는 이유는 여러가지 예외를 하나로 묶어 다루기 위해서이다.
+	ㄴ 즉, 예외가 발생했을 때 실제로 어떤 예외가 발생했고, 왜 발생했는지 알기 쉬워진다.
+만약 조상 클래스를 활용해서 하나의 클래스로 처리한다면 예외 발생 원인을 쉽게 알기 힘들것이다.
+	ㄴ 왜냐하면 추상적이므로, 자세하기 알기는 힘들 것이다.
+
+try {
+} catch ( SpaceException e){
+	InstallException ie = new InstallException(); // 던질 예외 클래스를 생성한다.
+	ie.initCause(e); // 원인 예외로 등록한다.
+	throw ie;
+}
+
+또 다른 이유는 checked 예외를 unchecked 예외로 바꿀 수 있다. 
+굳이 예외 처리를 필요로 하지 않는 예외를 unchecked로 바꿈으로 써, 의미없는 try-catch를 작성하지 않아도 된다.
+
+아래의 예제는 initCause의 예제와 로그이다.
+        try {
+            throw new Exception("예외가 발생했습니다.");
+        } catch (Exception e) {
+            try {
+                Exception ep = new Exception("서브서브");
+                ep.initCause(e);
+                throw ep;
+            } catch (Exception e2) {
+                RuntimeException re = new RuntimeException("굳이 catch 하지 않아도 된다.");
+                re.initCause(e2);
+                throw re;
+            }
+        }
+		
+Exception in thread "main" java.lang.RuntimeException: 굳이 catch 하지 않아도 된다.
+	at g_exception.ExceptionReThrow.method07(ExceptionReThrow.java:74)
+	at g_exception.Main.main(Main.java:25)
+Caused by: java.lang.Exception: 서브서브
+	at g_exception.ExceptionReThrow.method07(ExceptionReThrow.java:70)
+	... 1 more
+Caused by: java.lang.Exception: 예외가 발생했습니다.
+	at g_exception.ExceptionReThrow.method07(ExceptionReThrow.java:67)
+	... 1 more
+
