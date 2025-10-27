@@ -109,7 +109,13 @@ String strValue = "151";
 System.out.println(Integer.parseInt(strValue));
 System.out.println(Integer.valueOf(strValue));
 
-# 그 외에도 Double 같은 경우는 Double.parseDouble() 등 다른 기본형으로 변환하는 방법은 어렵지 않다.
+사실 parseInt와 valueOf() 는 크게 다르지 않다. valueOf는 parseInt를 호출하는 역할을 한다.
+왜 굳이 valueOf가 만들어 졌냐면, 메서드의 이름을 통일하기 위해서이다.
+
+3. String <-> 기본 자료형
+기본 자료형을 String으로 바꾸는 것은 String.valueOf() 를 통일하면 되기 때문에 어렵진 않다.
+다만 기본형의 경우 Boolean.parseBoolean() , Short.parseShort() , Long.parseLong() 등 기본 자료형에 대해서 문자열을 해당 기본형으로 바꿔주는 메서드가 있으니
+그것을 사용하면 된다.
 
 문자열을 정수로 바꾸는 parseInt 나 valueOf 를 사용할 경우 문자열에 공백이 포함되어 있으면 예외 ( NumberFormatException )
 이 발생할 수 있다. 그렇기 때문에 정수형으로 형 변환하기 전에 공백을 제거하는 trim 을 적절히 잘 사용해야 한다.
