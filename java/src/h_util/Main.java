@@ -1,10 +1,26 @@
 package h_util;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 public class Main {
 
     public static void main(String[] args) throws CloneNotSupportedException {
+        System.out.println("abcabc".substring(0,3));
+
+        String strValue = "151 ";
+        System.out.println(Integer.parseInt(strValue.trim()));
+        System.out.println(Integer.valueOf(strValue.trim()));
+        System.out.println(Integer.parseInt("fffff" , 16));
+
+        int value = 30;
+        System.out.println("" + value);
+        System.out.println(String.valueOf(30));
+
+        System.out.println(String.format("%s 값은 %d 이다." , "six" , 6));
+
+        // 2
+
         UtilClass uc = new UtilClass(0,0, new int[] {1,2,3});
         uc.key = 50;
         uc.value = 12;
@@ -30,6 +46,7 @@ public class Main {
         System.out.println(Arrays.toString(arr_4));
 
         System.out.println(uc.hashCode());
+        System.out.println(Charset.availableCharsets());
 
     }
 

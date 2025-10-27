@@ -83,3 +83,34 @@ new 연산자를 통해서 문자열을 생성하면 new 연산자를 통해서 
 
 클래스 파일을 보면 소스 파일에 있는 모든 리터럴들이 보관되어 있다.
 이 리터럴들은 클래스 로더에 의해 메모리에 올라갈 때, JVM 내에 있는 상수 저장소 ( constant pool ) 에 저장된다.
+
+- String.format()
+이 메서드는 형식화된 문자열을 만드는 메서드이다. Printf 와 사용하는 방법은 일치하다.
+String.format("%s 값은 %d 이다." , "six" , 6);
+
+- substring(int  start,int end)
+문자열에서 특정 부분을 추출하는 메서드이다.
+주의해야 할 점은 매개변수 중 int start 는 0번째 부터 시작하고, end 는 해당 위치의 포함하지 않는다.
+즉, 하단의 코드의 출력 결과는 "abc" 가 된다.
+System.out.println("abcabc".substring(0,3));
+
+
+- String과 int 간의 형 변환 ( 문자열과 기본형간에 형 변환 )
+1. Int -> String
+int를 String으로 바꾸는 방법은, 숫자를 빈 문자열과 더하거나, valueOf() 를 사용하는 방법이 있다.
+valueOf() 를 사용하는 것이 더 성능이 좋지만, 가독성의 이유로 빈 문자열을 더하는 것이다.
+int value = 30;
+System.out.println("" + value);
+System.out.println(String.valueOf(30));
+
+2. String -> Int
+반대로 String 을 Int로 바꾸는 방법은 valueOf 를 쓰거나 parseInt 를 쓰면 된다.
+String strValue = "151";
+System.out.println(Integer.parseInt(strValue));
+System.out.println(Integer.valueOf(strValue));
+
+# 그 외에도 Double 같은 경우는 Double.parseDouble() 등 다른 기본형으로 변환하는 방법은 어렵지 않다.
+
+문자열을 정수로 바꾸는 parseInt 나 valueOf 를 사용할 경우 문자열에 공백이 포함되어 있으면 예외 ( NumberFormatException )
+이 발생할 수 있다. 그렇기 때문에 정수형으로 형 변환하기 전에 공백을 제거하는 trim 을 적절히 잘 사용해야 한다.
+System.out.println(Integer.parseInt(strValue.trim()));
