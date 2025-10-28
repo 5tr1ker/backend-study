@@ -120,3 +120,47 @@ System.out.println(Integer.valueOf(strValue));
 문자열을 정수로 바꾸는 parseInt 나 valueOf 를 사용할 경우 문자열에 공백이 포함되어 있으면 예외 ( NumberFormatException )
 이 발생할 수 있다. 그렇기 때문에 정수형으로 형 변환하기 전에 공백을 제거하는 trim 을 적절히 잘 사용해야 한다.
 System.out.println(Integer.parseInt(strValue.trim()));
+
+[ StringBuffer 및 StringBuilder ]
+String 클래스와 달리 StringBuffer는 문자열을 편집할 수 있는 클래스이며, 두 클래스는 char형 배열을 가지고 있다는 공통점을 가지고 있다.
+StringBuffer는 내부적으로 문자열을 편집하기 위한 버퍼를 가지고 있으며 이 버퍼가 char형 배열이 된다. 이 배열은 편집할 문자열의 길이를 고려하여 넉넉하게 잡아야 한다.
+만일 버퍼의 크기가 모자르다면, 새로운 길이의 버퍼를 만들게 된다.
+	ㄴ 이때 새로운 길이의 배열을 생성 후 이전의 값을 복사해 온다.
+
+StringBuffer(int length) 생성자를 활용하여 버퍼의 길이를 지정할 수 있다. 만약 지정하지 않으면 16개의 문자를 저장할 수 있는 버퍼가 생성된다.
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("abc").append("de");
+
+        System.out.println(sb);
+위의 예제는 문자열 변경 가능한 StringBuffer의 예제이다.
+append() 메서드는 반환 타입이 StringBuffer ( 자기 자신 ) 이므로, 연속적으로 append() 를 호출하는 것이 가능하다.
+
+- StringBuffer의 문자열 비교
+StringBuffer 클래스는 equals 메서드가 오버라이딩 되어있지 않아 등가비교연산자(==)를 사용한 것과 같은 결과를 얻는다.
+하지만 toString()은 오버라이딩이 되어 있어 해당 인스턴스의 문자열을 반환하게 되어있다.
+
+따라서 StringBuffer간에 문자열 비교는 .toString() 으로 문자열을 뽑아낸 다음 .equals() 메서드로 비교 연산을 수행하면 된다..
+        StringBuffer sb = new StringBuffer();
+        sb.append("abc").append("de");
+
+        StringBuffer sb2 = new StringBuffer("abc").append("de");
+        System.out.println("sb == sb2 : " + (sb==sb2));	// false
+        System.out.println("sb equals sb2 : " + (sb.equals(sb2))); // false
+        System.out.println("sb str == sb2 str : " + (sb.toString().equals(sb.toString()))); // true
+		
+        StringBuffer sb3 = new StringBuffer(32);
+        System.out.println("버퍼 크기 : " + sb3.capacity());
+        System.out.println("문자열 추가 : " + sb3.append("hello"));
+        System.out.println("문자열 사이 추가 : " + sb3.insert(2 , " he"));
+        System.out.println("문자열 사이 제거 : " + sb3.delete(5,32));
+        System.out.println("문자열 바꾸기 : " + sb3.replace(0 , 2 , "sui"));
+        System.out.println("문자열 뒤바꾸기 : " + sb3.reverse());
+위의 예제 처럼 StringBuffer는 String 클래스에서 제공하는 대부분의 메서드를 가지고 있으며, 추가로 문자열을 제거, 수정하기 위한 메서드도 제공한다.
+
+- StringBuilder란?
+StringBuilder와 StringBuffer는 완전히 똑같은 기능을 제공하고 있다.
+다만 차이점은 StringBuffer는 멀티 쓰레드에 안전하게 동기화되어 있고, StringBuilder는 동기화를 지원하지 않는 클래스이다.
+이때 동기화는 성능을 떨어뜨리는 단점이 있기 때문에 싱글 쓰레드 환경에서는 StringBuilder를 사용하면 된다.
+
+다만 StringBuffer도 성능이 좋기 때문에 싱글쓰레드에서 동기화를 사용한다고 해도 프로그램이 눈에 띄게 느려지거나 하진 않는다.
