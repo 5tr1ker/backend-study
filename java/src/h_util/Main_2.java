@@ -3,6 +3,30 @@ package h_util;
 public class Main_2 {
 
     public static void main(String[] args) {
+        // Math 클래스
+        double value = 12.3456712;
+        value *= (1000);
+        System.out.println(Math.round(value) / 1000.0 );
+
+        System.out.println(Math.rint(12.345));
+        System.out.println(Math.rint(-1.5) + " : " + Math.round(-1.5));
+        System.out.println(Math.rint(-1.3) + " : " + Math.round(-1.3));
+        System.out.println(Math.rint(-1.8) + " : " + Math.round(-1.8));
+        System.out.println(Math.rint(1.5) + " : " + Math.round(1.5));
+        System.out.println(Math.rint(1.3) + " : " + Math.round(1.3));
+        System.out.println(Math.rint(1.8) + " : " + Math.round(1.8));
+
+        // 오버 플로우 발생
+        System.out.println(Math.addExact(10, 50));
+        //System.out.println(Math.addExact(2_000_000_000 , 2_000_000_000));
+        //System.out.println(Math.multiplyExact(123123, 124124));
+        //System.out.println(Math.negateExact(Integer.MIN_VALUE));
+
+        System.out.println(Math.sqrt(9.0));
+        System.out.println(Math.pow(3 , 3));
+
+
+
         StringBuffer sb = new StringBuffer();
         sb.append("abc").append("de");
 
