@@ -1,0 +1,54 @@
+[ 컬렉션 프레임워크 ]
+컬렉션 프레임워크는 데이터 그룹을 저장하는 클래스들을 표준화한 설계라고 한다.
+여기서 컬렉션은 데이터 그룹, 프레임워크는 표준화된 프로그래밍을 뜻한다.
+
+# 여기서 표준화는 기준을 설정하고 이에 따른다는 뜻이다.
+# JDK1.2 전에는 컬렉션 프레임워크가 없어서 컬렉션 클래스들을 각자 방식에 따라 따로 구현해야 했었다.
+
+컬렉션 프레임워크는 데이터 그룹을 3개로 나뉘었다. ( List, Set, Map )
+그 중 List와 Set은 공통된 부분이 많아 이러한 부분을 Collection 인터페이스에 분리 후 이를 상속받게 했다.
+List의 특징 : 순서가 있으며, 중복을 허용하는 데이터 집합
+	ㄴ ex) ArrayList, LinkedList, Vector, Stack
+Set의 특징 : 순서가 없으며, 중복을 허용하지 않는 데이터 집합
+	ㄴ ex) HashSet, TreeSet
+Map의 특징 : 순서가 없으며 Key와 Value의 쌍으로 이루어진 집합, Key는 중복을 허용하지 않으며 Value는 중복을 허용한다.
+	ㄴ ex) HashMap, TreeMap, Hashtable, Properties
+
+컬렉션 프레임워크에 모든 클래스드는 List와 Set, Map 중에 하나를 구현하고 있으며, 구현된 인터페이스의 이름을 가지고 있다.
+	ㄴ 예를 들면 HashSet은 Set을 구현했고, HashMap은 Map을 구현했고, ArrayList는 List를 구현했다.
+그러나 Vector와 Stack, Hashtable과 Properties 는 컬렉션 프레임워크가 나오기 전에 호환을 위해 남겨둔 클래스이므로,
+되도록이면 ArrayList나 HashMap 으로 사용하는 것이 좋다.
+# Vector와 Stack, Hashtable과 Properties 는 컬렉션 프레임워크가 나오기 전에 나온 클래스 이므로, 컬렉션 프레임워크의 명명 규칙에 적용되지 않았다.
+
+- Collection인터페이스
+Collection 인터페이스는 컬렉션 클래스 내에 데이터 그룹을 읽고, 추가하고, 삭제하는 등 데이터 그룹을 다루는데 가장 기본적인 메서드들을 제공한다.
+반환 타입이 boolean인 경우, 메서드의 작업이 성공하거나 변경되거나, 사실이면 true를 반환하게 된다.
+	ㄴ boolean add(E o) // 데이터의 추가가 성공하면 true
+	ㄴ boolean isEmpty() // 데이터가 비어있으면 true
+	ㄴ boolean retainAll(E o) // 데이터가 변경되었으면 true
+또한 반환 타입이 E 인 것은 지네릭스로 특정 타입을 의미한다.
+
+- List인터페이스
+List 인터페이스는 중복을 허용하고, 순서가 유지되는 컬렉션들을 구현할 때 사용된다.
+List 인터페이스의 상속 계층도는 다음과 같다.
+
+		List
+Vector	ArrayList	LinkedList
+Stack
+
+- Set인터페이스
+Set 인터페이스는 중복을 허용하지 않고, 순서가 없는 컬렉션 클래스를 구현하는 데 사용된다.
+Set 인터페이스의 상속 계층도는 다음과 같다.
+
+		Set
+HashSet	SortedSet
+		TreeSet
+
+- Map인터페이스
+Map 인터페이스는 키와 값을 하나의 쌍으로 묶어서 저장하는 컬렉션 클래스를 구현하는 데 사용된다.
+Key는 중복을 허용하지 않지만, Value는 중복을 허용한다. 만약 중복된 Key를 저장할 경우, 기존의 Value는 사라지고 새로 저장하는 Value가 저장된다.
+Map 인터페이스의 상속 계층도는 다음과 같다.
+
+			Map
+Hashtable	HashMap			SortedMap
+			LinkedHashMap	TreeMap
