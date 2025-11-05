@@ -1,10 +1,12 @@
 package i_collection;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class Main {
 
     public static void main(String[] args) {
+        /*
         ArrayList<Integer> ar = new ArrayList<>();
         ar.add(1);
         ar.add(2);
@@ -16,6 +18,25 @@ public class Main {
             }
         }
         System.out.println(ar);
+
+         */
+
+        ArrayList<Integer> ar = new ArrayList<>();
+
+        Vector<Integer> vector = new Vector<>(5);
+        vector.add(1);
+        vector.add(2);
+        vector.add(3);
+        System.out.println(vector);
+        System.out.println(vector.capacity());
+
+        vector.setSize(2);
+        System.out.println(vector);
+        System.out.println(vector.capacity());
+
+        vector.setSize(7);
+        System.out.println(vector);
+        System.out.println(vector.capacity());
     }
 
 }
