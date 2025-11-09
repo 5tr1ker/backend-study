@@ -152,3 +152,111 @@ Class Node {
 데이터의 조회는 ArrayList가 LinkedList보다 빠르다.
 	ㄴ 배열의 경우 각 요소가 연속적으로 저장되어 있기 때문에 주소의 계산식 ( 배열 주소 + index * 자료형size ) 으로 빠르게 데이터를 조회할 수 있지만,
 	LinkedList의 경우 각 요소가 불연속적으로 저장되어있고, 요소간에 연결이 되어있기 떄문에 그 연결을 따라가야 데이터를 찾을 수 있다.
+	
+[ Queue 와 Stack ]
+
+Stack은 가장 늦게 들어간 데이터가 가장 먼저 나오게 되는 LIFO ( Last In First Out ) 구조로 한 쪽 방향으로만 데이터를 넣고 꺼내게 된다.
+Stack은 데이터를 넣고, 꺼내게 될 때 데이터의 순서가 뒤바뀌게 된다. 예를 들어 스택에 0,1,2 를 넣고 꺼내면 2,1,0 이 된다.
+
+Queue는 가장 먼저 들어간 데이터가 가장 먼저 나오는 FIFO ( First In First Out ) 구조로 한 쪽으로는 데이터를 넣고, 반대 방향으로는 데이터를 꺼내게 된다.
+Queue는 데이터를 넣고 꺼내게 될 때 데이터의 순서가 유지된다.
+
+Stack과 같은 경우엔 데이터를 순차적으로 추가하고 삭제하기 때문에 ArrayList와 같은 배열 기반의 자료구조가 적합하고,
+Queue 같은 경우는 항상 첫번째의 데이터를 가져오기 때문에 ArrayList보다 LinkedList가 더 적합하다.
+	ㄴ ArrayList로 Queue를 구현할 경우 항상 첫번째의 데이터가 삭제되어, 데이터의 위치 변환으로 성능이 좋지 않다.
+	ㄴ 따라서 데이터의 추가와 삭제의 셩능이 빠른 LinkedList가 용이한 것이다.
+
+# Stack 은 컬렉션 프레임워크 이전부터 구현됐기 떄문에 ArrayList가 아닌 Vector 로부터 상속받아 구현되었다.
+
+# 참고로 Stack의 경우 스택 내부에 데이터를 삽입하는 add() , push(), offer() 메서드가 있는데 다음과 같은 차이가 있다.
+	ㄴ add() 지정된 객체를 Queue에 추가하고 해당 객체를 반환한다. 저장 공간 부족 시 IllegelStateException 예외
+	ㄴ offer() 지정된 객체를 저장하고, 성공 시 true, 실패 시 false 를 반환한다.
+	ㄴ push() Stack 에 객체를 저장하고, 해당 객체를 반환한다.
+	
+[ PriorityQueue 와 Deque ]
+PriorityQueue 는 Queue 인터페이스 중 하나로, 저장된 순서에 관계 없이 우선순위가 높은 데이터가 가장 먼저 나온다. 또한 Null을 저장할 수 없다.
+PriorityQueue 는 배열에 데이터를 저장하며, 힙을 이용하여 저장한다.
+        Queue<Integer> pq = new PriorityQueue<>();
+        pq.offer(4);
+        pq.offer(8);
+        pq.offer(5);
+        pq.offer(12);
+        pq.offer(1);
+
+        System.out.println(pq);
+        while(!pq.isEmpty()) {
+            System.out.println(pq.poll());
+        }
+
+[1, 4, 5, 12, 8]
+1
+4
+5
+8
+12
+
+위의 예제와 같이 저장된 순서와 다르게 작은 값 부터 출력된다. 정수가 작은 값일 수록 우선 순위가 높기 때문이다.
+물론 정수 뿐만이 아니라 객체를 저장할 수 있는데, 객체를 저장할 경우 객체의 우선 순위를 비교하는 방법을 제공해야 한다.
+
+# PriorityQueue 를 출력하면 내부 배열의 값을 출력하고 있는데, 힙 이라는 자료구조의 형태로 저장되기 때문에 삽입 순서와는 다르다.
+
+- Deque
+Deque ( 덱 또는 디큐 ) 는 Queue의 변형으로, 양쪽 끝에서 추가/삭제할 수 있다.
+덱은 스택과 큐를 합쳐놓은 것과 같으며, 스택처럼 사용할 수 있고 큐 처럼 사용할 수 있다.
+
+# Deque 의 구현체로는 ArrayDeque 와 LinkedList 가 있다.
+
+[ Iterator , ListIterator , Enumeration ]
+Iterator, ListIterator, Enumeration 모두 컬렉션에 저장된 요소에 접근하기 위해 사용되는 인터페이스이다.
+Enumeration은 가장 구버전이고, ListIterator 는 Iterator 의 기능을 향상시킨 것이다.
+
+- Iterator
+컬렉션 프레임워크에서는 컬렉션에 저장된 요소들을 읽어오는 방법을 표준화 하였다.
+컬렉션에 저장된 각 요소에 접근하는 기능을 가진 Iterator 인터페이스와 Collection 인터페이스에는 Iterator 객체를 반환하는 메서드를 가지고 있다.
+# Collection인터페이스의 자손인 List인터페이스와 Set인터페이스도 모두 포함되어 있고, 이를 구현한 클래스들은 각자 컬렉션 클래스에 맞게 구현되어 있다.
+
+각 컬렉션 클래스는 Iterator() 를 호출하여 Iterator 객체를 얻은 후 반복문 ( 주로 while ) 문을 통해 컬렉션 클래스의 각 요소에 접근할 수 있다.
+
+- Iterator 인터페이스가 가지고 있는 메서드
+boolean hasNext() : 다음 읽어올 요소가 있으면 true, 아니면 false
+Object next() : 다음 요소를 읽어온다.
+void remove() : next()로 읽어온 요소를 삭제한다.
+	ㄴ remove()는 단독으로 쓰일 수 없으며, next()를 통해 얻어온 객체를 remove() 해야 한다.
+        ArrayList<Integer> list = new ArrayList<>();
+        for(int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        Iterator<Integer> iterator = list.iterator();
+        while(iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+
+# 물론 ArrayList 뿐만 아니라 Collection인터페이스를 구현한 다른 클래스도 다음과 같이 코드를 작성할 수 있다.
+# 이는 Iterator 인터페이스를 통해 각 요소에 접근하는 방법을 표준화 했기 때문에, 재 사용성이 높은 코드를 작성할 수 있다.
+# 따라서 인터페이스를 통해 표준을 정하고, 이러한 표준을 따르게 하여 구현하면 재사용성이 높아지게 된다.
+
+다만 Map 인터페이스를 구현한 컬렉션 클래스의 경우 keySey() 을 통해 set 객체를 얻은 다음 Iterator 를 얻어야 한다.
+
+- ListIterator 와 Enumeration
+Enumeration은 컬렉션 프레임워크가 나타나기 전에 사용하던 것으로, 기존 소스와의 호환성을 위해 남겨둔 것이다.
+	ㄴ 따라서 Enumeration은 Iterator와 제공하는 기능은 같다. 다만 메서드의 이름이 살짝 다르다. ( hasNext -> hasMoreElements , next -> nextElement )
+	
+ListIterator는 Iterator를 상속받아서 확장시킨 것으로, 기존 단 방향으로 이동하던 Iterator와 달리 이전 방향으로 이동할 수 있게 확장했다.
+	ㄴ 단 List인터페이스를 구현한 컬렉션 프레임워크만 가능하다.
+
+        ArrayList<Integer> list = new ArrayList<>();
+        for(int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+		
+        ListIterator listIterator = list.listIterator();
+        while(listIterator.hasNext()) {
+            System.out.println(listIterator.next());
+        }
+        
+        while(listIterator.hasPrevious()) {
+            System.out.println(listIterator.previous());
+        }
+
+위와의 예제는 양방향으로 요소들에 접근하는 방법을 보여준다. 기존 Iterator는 끝에 다다르면 더이상 사용할 수 없지만, ListIterator는 반대 방향으로 갈 수 있다.
+물론 다음 요소가 있는지 hasNext 와 hasPrevious 를 통해서 확인해야 한다. 
