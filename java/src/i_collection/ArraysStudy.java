@@ -15,7 +15,7 @@ public class ArraysStudy {
         int arr2[] = new int[10];
         Arrays.fill(arr2, -1);
         System.out.println(Arrays.toString(arr2));
-        Arrays.setAll(arr2, () -> (int) (Math.random() * 5) + 1);
+        //Arrays.setAll(arr2, () -> (int) (Math.random() * 5) + 1);
         System.out.println(Arrays.toString(arr2));
 
 
