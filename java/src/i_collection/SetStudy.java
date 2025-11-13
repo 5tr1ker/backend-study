@@ -1,9 +1,6 @@
 package i_collection;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 class Person {
     int age;
@@ -46,13 +43,23 @@ public class SetStudy {
 //            System.out.println(set);
 //        }
 
-        HashSet<Person> people = new HashSet<>();
+//        HashSet<Person> people = new HashSet<>();
+//        for(int i = 0; i < 10; i++) {
+//            Person person = new Person((int) (Math.random() * 5) + 1,"People");
+//            people.add(person);
+//        }
+//
+//        System.out.println(people);
+
+        TreeSet<Integer> treeSet = new TreeSet<>();
         for(int i = 0; i < 10; i++) {
-            Person person = new Person((int) (Math.random() * 5) + 1,"People");
-            people.add(person);
+            treeSet.add((int) (Math.random() * 100) + 1);
         }
 
-        System.out.println(people);
+        System.out.println(treeSet);
+        System.out.println(treeSet.subSet(0 , 20)); // 범위 검색
+        System.out.println(treeSet.headSet(50)); // 50 보다 작은거
+        System.out.println(treeSet.tailSet(50)); // 50 보다 큰거
     }
 
 }
