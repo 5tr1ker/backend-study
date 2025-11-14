@@ -222,3 +222,21 @@ TreeSet에 데이터를 저장할 때, TreeSet 내부에는 항상 정렬된 상
 
 위의 예제에선 add() 메서드를 통해 TreeSet에 데이터를 저장할 수 있다.
 또한 subSet() 를 통해 범위 검색을 할 수 있으며, headSet과 tailSet을 통해 특정 값 기준으로 큰 객체와 작은 객체를 가지고 올 수 있따.
+
+[ HashMap과 Hashtable ]
+HashMap과 Hashtable의 관계는 ArrayList와 Vector와 같다. 그렇기 때문에 Hashtable을 사용하는 것 보다, HashMap을 사용하는 것이 좋다.
+HashMap은 Map 인터페이스를 구현했기 떄문에 키와 값을 하나로 묶어서 데이터를 저장한다. 그리고 해싱을 사용하기 때문에 데이터 탐색이 빠르다.
+
+HashMap은 내부의 Entry 배열을 가지고 있다. Entry는 HashMap의 내부 클래스이며, 키와 값을 하나로 가지고 있는 클래스이다.
+	ㄴ 키와 값을 각각의 배열로 관리하기엔 데이터 무결성에 문제가 생길 수 있다.
+
+* Key : 컬렉션 내에 키는 유일해야 한다.
+* Value : 키와 달리 데이터의 중복을 허용한다.
+HashMap 내에 키는 컬렉션 내에서 유일해야하며, 값은 중복되어도 괜찮다.
+또한 HashMap에 저장된 데이터를 하나의 키로 검색할 때, 단 하나의 값을 나와야 한다.
+만약 put() 메서드를 통해 저장되는 키가 HashMap에 이미 존재한다면, 해당 값으로 덮어 씌워진다.
+
+hashMap.put("id" , "passw0rd");
+hashMap.put("id" , "password");
+즉, 위와 같은 코드를 실행하면 passw0rd 가 아니라 password 값이 저장된다.
+
