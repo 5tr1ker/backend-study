@@ -63,7 +63,7 @@ public class SetStudy {
         System.out.println(treeSet.tailSet(50)); // 50 보다 큰거
 
 
-         */
+
         String input = "awgawgsrhtdjasdrthasdrjadrhasdg";
         HashMap<String, Integer> hashMap = new HashMap<>();
 
@@ -80,6 +80,18 @@ public class SetStudy {
         for (String key : hashMap.keySet()) {
             System.out.printf("[%s] : %d%n", key, hashMap.get(key));
         }
+
+         */
+
+        TreeMap<Integer, String> treeMap = new TreeMap<>();
+        for(int i = 0; i < 10; i++) {
+            treeMap.put((int) (Math.random() * 10) + 1, (int) (Math.random() * 12) + 'A' + "");
+        }
+
+        System.out.println(treeMap);
+        System.out.println(treeMap.subMap(3,8));
+        System.out.println(treeMap.tailMap(5));
+        System.out.println(treeMap.headMap(5));
     }
 
 }
