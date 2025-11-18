@@ -293,3 +293,20 @@ TreeMap은 이진 탐색 트리의 형태로 키와 값의 쌍으로 이루어�
 {3=70, 4=72, 5=76, 7=75}
 {5=76, 7=75, 9=68}
 {1=67, 3=70, 4=72}
+
+[ Properties ]
+Properties는 HashMap의 구버전인 Hashtable을 상속받아 구현한 것으로, Hashtable은 키와 값을 (Object, Object) 로 저장하는데, Properties는 (String, String) 으로 저장한다.
+Properties는 어플리케이션의 환경 설정과 같은 속성 값을 저장하는데 사용되며, 파일로부터 읽고 쓰는데 편리한 기능을 제공한다.
+
+Properties에는 setProperty() 를 이용해서 값을 저장할 수 있고, getProperty() 를 이용해서 값을 추출할 수 있다.
+# setProperty() 는 단순히 hashtable의 put 메서드를 호출한다.
+System.out.println(prop.getProperty("avb" , "empty!"));
+System.out.println(prop.getProperty("awfawf"));
+위의 예제에서 getProperty는 properties에서 특정 키의 값을 가져오는 역할을 한다. 만약 없다면 null을 반환 하고 2번째 인자를 제공하면 해당 값을 제공한다. ( 기본 값 )
+
+Properties는 Hashtable을 상속받아 구현했기 때문에 Map의 특성상 저장순서를 유지하지 않는다.
+또한 Properties는 컬렉션 프레임워크가 나타나기 전에 나온 컬렉션 클래스이므로 Iterator가 아닌 Enumeration을 사용한다.
+# 즉 properties에 있는 모든 요소를 순회할 때 Enumeration으로 순회해야 한다.
+
+Properties에서 load 를 통해서 파일에서 데이터를 읽어오고, store() 혹은 storeToXML()를 통해서 파일로 저장할 수 있다.
+# 이때 파일은 키=값 으로 값을 묶어야 한다.
