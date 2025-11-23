@@ -1,0 +1,159 @@
+[ 열거형 ]
+열거형은 JDK1.5 부터 등장하였으며 C언어의 열거형과는 달리 값 뿐만이 아니라 타입까지 관리할 수 있다.
+자바의 열거형은 typesafe 한 enum 이라고 할 수 있다. 그 이유는 C언어는 타입이 달라도 값이 같으면 조건식의 결과가 true인데, Java의 경우 값이 같아도 값이 다르면 false를 반환한다.
+# 상수 값이 바뀌면, 해당 상수를 사용하는 모든 소스를 다시 컴파일해야하지만, 열거형 상수를 사용하면 기존 소스를 컴파일하지 않아도 된다.
+
+- 열거형의 사용
+열거형을 정의하는 방법은 중괄호({}) 안에 상수의 이름을 나열하기만 하면 된다.
+enum Hyundai {
+
+    AVANTE , SONATA , GRANDEUR , KONA , TUCSON , SANTAFE , PALLISADE
+
+}
+System.out.println(Hyundai.AVANTE);
+또한 열거형에 정의된 상수를 사용하는 방법은 "열거형이름.상수명" 으로 사용한다.
+
+열거형 상수간에는 "==" 를 사용할 수 있어 빠른 성능을 제공하고 있다. 다만 비교연산자 같은 경우 < , > 를 사용할 수 없고 compareTo() 를 사용해야 한다.
+if(Hyundai.SONATA != Hyundai.AVANTE) {
+	System.out.println("두 차종은 다른 차종..");
+}
+System.out.println(Hyundai.GRANDEUR.compareTo(Hyundai.SONATA));
+
+또한 열거형은 switch 문에서 활용될 수 있다. 다만 case 문에서는 열거형의 이름은 생략하고 상수명만 적어야 한다.
+switch (Hyundai.GRANDEUR) {
+    case AVANTE:
+        System.out.println("아반뗴");
+        break;
+    case SONATA:
+        System.out.println("쏘나타");
+        break;
+    case GRANDEUR:
+        System.out.println("그랜저");
+        break;
+    default:
+        System.out.println("??");
+}
+
+Hyundai[] hyundais = Hyundai.values();
+System.out.println(Arrays.toString(hyundais));
+
+또한 values() 메서드를 활용하면 열거형에 정의된 모든 상수를 배열로 반환한다.
+
+또한 valueOf 메서드는 열거형 상수의 이름으로 열거형 참조를 얻을 수 있다.
+System.out.println(Hyundai.valueOf("AVANTE"));
+
+위의 values()와 valueOf() 는 모든 열거형이 가지고 있는 것으로 컴파일러가 자동으로 만들어준다.
+
+- 모든 열거형의 조상 java.lang.Enum
+
+모든 열거형의 최고 조상은 Enum 클래스에는 유용한 클래스들을 많이 제공하고 있다.
+int ordinal() - 열거형 상수가 정의된 순서를 반환한다. ( 0 부터 )
+T valueOf(Class<T> enumType, String name) - 지정된 이름에 일치하는 열거형 상수를 반환한다.
+String name() - 열거형 상수의 이름을 문자열로 반환한다.
+	ㄴ System.out.println(Hyundai.AVANTE.name());
+	
+- 열거형 인스턴스 멤버 추가
+열거형 상수에 인스턴스 멤버를 추가하기 위해선 상수의 이름 옆에 원하는 값을 괄호와 함께 적어준다.
+그리고 지정된 값을 저장하기 위한 인스턴스 변수와 생성자를 추가해주어야 한다.
+# 이때 열거형 상수를 모두 정의한 다음, 멤버 변수와 생성자를 정의해야 한다.
+
+enum Hyundai {
+
+    AVANTE(1600) , SONATA(2000) , GRANDEUR(3500);
+
+    private final int cc;
+    Hyundai(int cc) {
+        this.cc = cc;
+    }
+
+    public int getCc() {
+        return cc;
+    }
+
+}
+
+열거형의 생성자를 추가했다고 해서 객체를 생성할 수 있는 것은 아니다. 생성자는 제어자가 묵시적으로 private 로 된다.
+필요하다면 2개 이상의 값을 지정할 수 있다. 다만 인스턴스 변수와 생성자를 추가해주어야 한다.
+# 열거형 내부에는 비즈니스 로직이 포함된 메서드와 static 멤버를 선언할 수 있다.
+
+- 열거형 추상 메서드
+열거형 내부에 추상 메서드를 선언할 수 있다. 추상 메서드를 선언할 경우 모든 열거형 상수는 추상 메서드를 구현해야 한다.
+enum Hyundai {
+
+    AVANTE(1600) {
+        @Override
+        public double calculate0_100() {
+            return 9.3;
+        }
+    }, SONATA(2000) {
+        @Override
+        public double calculate0_100() {
+            return 8.8;
+        }
+    } , GRANDEUR(3500) {
+        @Override
+        public double calculate0_100() {
+            return 7.9;
+        }
+    };
+
+    private final int cc;
+    public abstract double calculate0_100();
+    Hyundai(int cc) {
+        this.cc = cc;
+    }
+
+    public int getCc() {
+        return cc;
+    }
+
+}
+
+추상 메서드의 경우, 각 열거형 상수들이 각각 다른 비즈니스 로직을 가질 때 구현하며, 그러지 않을 경우 일반 메서드를 구현하는 것이 좋다.
+
+[ 어노테이션 ]
+어노테이션은 주석, 주해, 메모라는 뜻을 가지고 있으며 소스코드와 문서를 함께 다루기 위해 사용된다.
+어노테이션은 주석안에 소스코드에 대한 정보들을 저장하고, 미리 정의된 태그들을 이용해서 문서를 작성한 다음, javadoc.exe 프로그램을 만들어서 문서로 만든다.
+# javadoc.exe는 소스코드의 주석으로부터 HTML 문서를 만드는 프로그램이다.
+
+어노테이션은 주석처럼 프로그래밍 언어에 영향을 미치지 않으며, 해당 코드를 사용하는 다른 프로그램에게 유용한 정보를 제공한다.
+
+@Test
+public void method() {
+}
+
+위의 코드는 테스트 프로그램에게 테스트를 해야할 메서드임을 알려준다.
+여기서 테스트 프로그램에게 호출해야 할 메서드를 일일이 정의하지 않고, 각각의 메서드 선언부 위에 @Test 를 붙여주기만 하면 된다.
+단, 어노테이션은 모든 프로그램에게 유용한 것은 아니라 해당 프로그램이 미리 정의된 형식이여야 한다. 즉 @Test는 테스트 프로그램에게 유용한 것이며 다른 프로그램에겐 필요없는 것이다.
+
+JDK에서 제공하는 표준 어노테이션은 컴파일러를 위한 것이다. 컴파일러에게 유용한 정보를 제공한다.
+또한 메타 어노테이션은 다른 어노테이션을 정의하는데 사용된다.
+
+- 표준 에너테이션
+
+1. @Override
+메서드 앞에서만 붙일 수 있는 어노테이션으로 조상 클래스의 메서드를 오버라이딩하는 것을 알린다.
+해당 어노테이션은 필수는 아니지만, 메서드 앞에 선언될 경우 조상 클래스의 메서드 명과 동일한 것이 있는지 확인하고 없으면 오류를 발생시킨다.
+# 오버라이딩할 조상 클래스의 메서드 명을 실수로 다르게 할 경우 이를 알아차리긴 힘들다. 새로운 메서드를 선언하는 것으로 간주하며, 메서드를 호출해도 조상의 메서드가 호출되기 때문이다.
+public class SubClass extends SuperClass {
+    @Override
+    public void print() {
+    }
+
+}
+
+2. @Deprecated
+이는 새로운 JDK 버전이 나옴으로써, 기존의 기능을 대체하거나 사용되지 않을 때 사용된다.
+기존 코드를 제거해도 되지만, 사용되고 있는 코드가 있으므로 함부로 제거할 수 없다, 따라서 해당 어노테이션을 필드나 메서드에 선언함으로써 사용하지 말 것을 권한다.
+    @Deprecated
+    public Date(int year, int month, int date) {
+        this(year, month, date, 0, 0, 0);
+    }
+	
+@Deprecated 가 붙은 대상을 사용할 순 있지만, 보통 개선된 버전을 사용하도록 유도한다.
+# @Deprecated가 붙은 대상을 작성하여 컴파일 할 경우 컴파일 경고가 나긴 하지만 코드는 돌아간다.
+
+
+3. @FunctionalInterface
+함수형 인터페이스를 선언할 때 해당 어노테이션을 선언하면, 컴파일러가 함수형 인터페이스를 올바르게 선언했는지 확인하고 잘못 선언했을 경우 오류를 발생시킨다.
+필수는 아니지만 @Override 처럼 잘못 정의할 수 있는 실수를 사전에 방지할 수 있다.
