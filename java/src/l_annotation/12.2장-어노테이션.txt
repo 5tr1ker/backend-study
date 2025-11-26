@@ -157,3 +157,59 @@ public class SubClass extends SuperClass {
 3. @FunctionalInterface
 함수형 인터페이스를 선언할 때 해당 어노테이션을 선언하면, 컴파일러가 함수형 인터페이스를 올바르게 선언했는지 확인하고 잘못 선언했을 경우 오류를 발생시킨다.
 필수는 아니지만 @Override 처럼 잘못 정의할 수 있는 실수를 사전에 방지할 수 있다.
+
+4. @SuppressWarnings
+@SuppressWarnings 는 컴파일 시점에 컴파일러가 알려주는 경고 메세지를 억제할 때 사용한다.
+보통 경고는 발생하면 무시하고 넘어가도 되지만, 문제를 해결한 경고의 경우 @SuppressWarnings 를 사용해서 컴파일 시점에 보이지 않게 함으로써, 다른 오류를 놓치지 않게 한다.
+
+@SuppressWarnings 으로 억제할 수 있는 경고는 deprecation , unchecked , rawtypes , varargs 등.. 이 있다.
+	ㄴ 주로 사용하는 것은 위의 4가지 이며, JDK 버전이 올라가면서 새로운 경고 메세지가 발생할 수 있다.
+@SuppressWarnings() 어노테이션 괄호안에 억제하려고 하는 경고를 문자열로 제공하면 된다.
+ex ) 
+    @SuppressWarnings("deprecation")
+    public static void main(String[] args) {
+        Date date = new Date(2000 , Calendar.APRIL, 2);
+    }
+위의 예제는 deprecation 됨으로써 발생하는 오류를 출력되지 않게 억제한다.
+만약 2개 이상의 경고를 억제하려면 아래의 예제와 같이 {} 괄호를 이용해서 여러 문자열을 기입하면 된다.
+@SuppressWarnings({"deprecation" , "rawtypes" , "unchecked"})
+public static void main(String[] args) {
+	Date date = new Date(2000 , Calendar.APRIL, 2);
+	ArrayList arrayList = new ArrayList();
+	arrayList.add(date);
+}
+
+- 경고 메세지 종류 확인
+만일 JDK 버전이 올라가면서 새로운 경고 메세지가 추가되는데, 추가된 경고 메세지를 확인하려면 컴파일할 때 -Xlint 옵션을 넣으면 경고 메세지의 종류를 알 수 있다.
+PS 경로\backend-study\java> javac -Xlint .\src\l_annotation\AnnotationStudy.java
+.\src\l_annotation\AnnotationStudy.java:17: warning: [rawtypes] found raw type: List
+    public static void a(List a) {
+                         ^
+  missing type arguments for generic class List<E>
+  where E is a type-variable:
+    E extends Object declared in interface List
+1 warning
+
+위의 내용은 컴파일할 때 -Xlint 옵션을 통해 경고 메세지를 나오게 했다. 경고 메세지 내부에 [] 괄호 안에 있는 내용이 경고메세지 종류이다. ( [rawtypes] )
+이를 억제하게 하려면 @SuppressWarnings("rawtypes") 으로 지정하면 된다.
+
+# -Xlint:unchecked 로 지정하면 unchecked 와 관련된 경고 메세지만 나오게 된다.
+
+5. @SafeVarargs
+메서드에 선언된 가변인자의 타입이 non-reifiable 타입일 경우, 해당 메서드를 선언한 곳에서 unchecked 경고가 발생한다.
+해당 코드의 문제가 없다면 @SafeVarargs 를 사용하여 억제한다.
+
+# 해당 어노테이션은 오버라이드 될 수 있는 메서드에서는 사용될 수 없다.
+# non-reifiable 은 컴파일 이후에 제거되는 타입으로 제네릭은 여기에 해당된다. reifiable 은 컴파일 이후에 제거되지 않는 타입으로 기본 자료형 ( int , double ) , 객체 ( String , Objects ) 등이 될 수 있다.
+
+ex )
+@SafeVarargs
+public static <T>void safeTest(T... a) {
+	for(int i = 0; i < a.length; i++) {
+		System.out.println(a[i]);
+	}
+}
+
+가변인자가 non-reifiable 일 때 해당 오류가 발생하는 이유는 타입 안정성이 떨어지기 때문이다. 즉 T 는 컴파일 시점에 Object로 바뀌기 때문에 어떠한 타입의 객체가 들어올 수 있기 때문이다.
+
+# @SafeVarargs 는 @SuppressWarnings("unchecked") 를 대신 사용하여도 경고를 무시할 수 있다.
