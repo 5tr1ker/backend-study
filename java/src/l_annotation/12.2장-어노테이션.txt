@@ -1,116 +1,3 @@
-[ 열거형 ]
-열거형은 JDK1.5 부터 등장하였으며 C언어의 열거형과는 달리 값 뿐만이 아니라 타입까지 관리할 수 있다.
-자바의 열거형은 typesafe 한 enum 이라고 할 수 있다. 그 이유는 C언어는 타입이 달라도 값이 같으면 조건식의 결과가 true인데, Java의 경우 값이 같아도 값이 다르면 false를 반환한다.
-# 상수 값이 바뀌면, 해당 상수를 사용하는 모든 소스를 다시 컴파일해야하지만, 열거형 상수를 사용하면 기존 소스를 컴파일하지 않아도 된다.
-
-- 열거형의 사용
-열거형을 정의하는 방법은 중괄호({}) 안에 상수의 이름을 나열하기만 하면 된다.
-enum Hyundai {
-
-    AVANTE , SONATA , GRANDEUR , KONA , TUCSON , SANTAFE , PALLISADE
-
-}
-System.out.println(Hyundai.AVANTE);
-또한 열거형에 정의된 상수를 사용하는 방법은 "열거형이름.상수명" 으로 사용한다.
-
-열거형 상수간에는 "==" 를 사용할 수 있어 빠른 성능을 제공하고 있다. 다만 비교연산자 같은 경우 < , > 를 사용할 수 없고 compareTo() 를 사용해야 한다.
-if(Hyundai.SONATA != Hyundai.AVANTE) {
-	System.out.println("두 차종은 다른 차종..");
-}
-System.out.println(Hyundai.GRANDEUR.compareTo(Hyundai.SONATA));
-
-또한 열거형은 switch 문에서 활용될 수 있다. 다만 case 문에서는 열거형의 이름은 생략하고 상수명만 적어야 한다.
-switch (Hyundai.GRANDEUR) {
-    case AVANTE:
-        System.out.println("아반뗴");
-        break;
-    case SONATA:
-        System.out.println("쏘나타");
-        break;
-    case GRANDEUR:
-        System.out.println("그랜저");
-        break;
-    default:
-        System.out.println("??");
-}
-
-Hyundai[] hyundais = Hyundai.values();
-System.out.println(Arrays.toString(hyundais));
-
-또한 values() 메서드를 활용하면 열거형에 정의된 모든 상수를 배열로 반환한다.
-
-또한 valueOf 메서드는 열거형 상수의 이름으로 열거형 참조를 얻을 수 있다.
-System.out.println(Hyundai.valueOf("AVANTE"));
-
-위의 values()와 valueOf() 는 모든 열거형이 가지고 있는 것으로 컴파일러가 자동으로 만들어준다.
-
-- 모든 열거형의 조상 java.lang.Enum
-
-모든 열거형의 최고 조상은 Enum 클래스에는 유용한 클래스들을 많이 제공하고 있다.
-int ordinal() - 열거형 상수가 정의된 순서를 반환한다. ( 0 부터 )
-T valueOf(Class<T> enumType, String name) - 지정된 이름에 일치하는 열거형 상수를 반환한다.
-String name() - 열거형 상수의 이름을 문자열로 반환한다.
-	ㄴ System.out.println(Hyundai.AVANTE.name());
-	
-- 열거형 인스턴스 멤버 추가
-열거형 상수에 인스턴스 멤버를 추가하기 위해선 상수의 이름 옆에 원하는 값을 괄호와 함께 적어준다.
-그리고 지정된 값을 저장하기 위한 인스턴스 변수와 생성자를 추가해주어야 한다.
-# 이때 열거형 상수를 모두 정의한 다음, 멤버 변수와 생성자를 정의해야 한다.
-
-enum Hyundai {
-
-    AVANTE(1600) , SONATA(2000) , GRANDEUR(3500);
-
-    private final int cc;
-    Hyundai(int cc) {
-        this.cc = cc;
-    }
-
-    public int getCc() {
-        return cc;
-    }
-
-}
-
-열거형의 생성자를 추가했다고 해서 객체를 생성할 수 있는 것은 아니다. 생성자는 제어자가 묵시적으로 private 로 된다.
-필요하다면 2개 이상의 값을 지정할 수 있다. 다만 인스턴스 변수와 생성자를 추가해주어야 한다.
-# 열거형 내부에는 비즈니스 로직이 포함된 메서드와 static 멤버를 선언할 수 있다.
-
-- 열거형 추상 메서드
-열거형 내부에 추상 메서드를 선언할 수 있다. 추상 메서드를 선언할 경우 모든 열거형 상수는 추상 메서드를 구현해야 한다.
-enum Hyundai {
-
-    AVANTE(1600) {
-        @Override
-        public double calculate0_100() {
-            return 9.3;
-        }
-    }, SONATA(2000) {
-        @Override
-        public double calculate0_100() {
-            return 8.8;
-        }
-    } , GRANDEUR(3500) {
-        @Override
-        public double calculate0_100() {
-            return 7.9;
-        }
-    };
-
-    private final int cc;
-    public abstract double calculate0_100();
-    Hyundai(int cc) {
-        this.cc = cc;
-    }
-
-    public int getCc() {
-        return cc;
-    }
-
-}
-
-추상 메서드의 경우, 각 열거형 상수들이 각각 다른 비즈니스 로직을 가질 때 구현하며, 그러지 않을 경우 일반 메서드를 구현하는 것이 좋다.
-
 [ 어노테이션 ]
 어노테이션은 주석, 주해, 메모라는 뜻을 가지고 있으며 소스코드와 문서를 함께 다루기 위해 사용된다.
 어노테이션은 주석안에 소스코드에 대한 정보들을 저장하고, 미리 정의된 태그들을 이용해서 문서를 작성한 다음, javadoc.exe 프로그램을 만들어서 문서로 만든다.
@@ -213,3 +100,91 @@ public static <T>void safeTest(T... a) {
 가변인자가 non-reifiable 일 때 해당 오류가 발생하는 이유는 타입 안정성이 떨어지기 때문이다. 즉 T 는 컴파일 시점에 Object로 바뀌기 때문에 어떠한 타입의 객체가 들어올 수 있기 때문이다.
 
 # @SafeVarargs 는 @SuppressWarnings("unchecked") 를 대신 사용하여도 경고를 무시할 수 있다.
+
+[ 메타 에너테이션 ]
+메타 어노테이션은 어노테이션을 위한 어노테이션으로, 어노테이션을 정의할 때 적용되는 대상 ( target ) 이나 유지 기간 ( retention ) 등을 정의하는 데 사용된다.
+
+1. @Target
+해당 어노테이션이 적용될 수 있는 대상을 지정한다.
+여러개로 지정한다면 {} 괄호를 이용하여 배열로 나열하면 된다.
+ex ) @Target({TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE})
+ANNOTATION_TYPE - 어노테이션
+CONSTRUCTOR - 생성자
+FIELD - 필드 ( 멤버변수, enum 상수 ) ( 기본형에 사용된다 )
+LOCAL_VARIABLE - 지역변수
+METHOD - 메서드
+PACKAGE - 패키지
+PARAMETER - 매개변수
+TYPE - 타입 ( 클래스, 인터페이스, enum )
+TYPE_PARAMETER - 타입매개변수
+TYPE_USE - 타입이 사용되는 모든 곳 ( 참조형에 사용된다. )
+# 위의 값들은 java.lang.annotation.ElementType 이라는 열거형에 정의되어 있다.
+
+    @Target(TYPE)
+    public @interface MyTypeAnnotation {}
+
+    @Target(FIELD)
+    public @interface MyFieldAnnotation {}
+
+    @Target(TYPE_USE)
+    public @interface MyTypeUseAnnotation {}
+
+    @MyTypeAnnotation
+    class MyClass {
+
+        @MyTypeUseAnnotation
+        MyClass clazz;
+        
+        @MyFieldAnnotation
+        int a;
+    }
+
+TYPE은 타입을 선언할 때 사용할 수 있고, TYPE_USE 는 해당 타입의 변수가 선언될 때 사용할 수 있다는 것이다.
+
+2. @Retention
+애너테이션이 유지되는 기간을 지정하는데 사용된다. 유지 정책은 아래와 같다.
+SOURCE - 소스 파일에만 존재, 클래스파일에는 존재하지 않음.
+CLASS - 클래스 파일에 존재 실행시에 사용불가 ( 기본값 )
+RUNTIME 클래스 파일에 존재, 실행시에 사용가능
+
+@Override와 @SuppressWarnings 처럼 컴파일러가 사용하는 어노테이션은 SOURCE 이다.
+RUNTIME은 실행 시 '리플렉션'을 통해 클래스 파일에서 어노테이션의 정보를 읽어 처리할 수 있다.
+CLASS는 클래스 파일에 어노테이션 정보가 있지만, 클래스 파일이 JVM에 로딩될 때 해당 어노테이션을 사용할 수 없다. ( 즉, 실행시에 사용할 수 없어서 잘 사용하지 않는다. ) 
+
+3. @Documented
+해당 어노테이션의 정보가 javadoc 를 통해 생성된 문서에 포함되게 한다.
+
+4. @Inherited
+해당 어노테이션이 자손 클래스에도 적용되게 한다.
+
+즉 @Inherited 가 붙은 어노테이션을 조상 클래스에 붙이면, 자손 클래스도 해당 어노테이션을 상속받는다.
+
+5. @Repeatable
+하나의 대상에 여러개의 어노테이션을 붙일 수 있게 한다. 단, 여러번 선언된 어노테이션들을 하나로 다루기 위해 @Repeatable 인자 값으로 어노테이션을 처리할 어노테이션을 추가로 지정해주어야 한다.
+
+    @Repeatable(Todos.class)
+    public @interface Todo {
+        String value();
+    }
+
+    public @interface Todos {
+        Todo[] value();
+    }
+
+    @Todo("todo1")
+    @Todo("todo2")
+    public static void main(String[] args) {
+
+
+
+    }
+	
+6. @Native
+네이티브 메서드에 의해 참조되는 상수 필드에 붙이는 어노테이션이다.
+
+네이티브 메서드는 JVM이 설치된 OS의 메서드를 말한다.
+public final native Class<?> getClass(); // 이는 Object에 정의되어 있는 네이티브 메서드이다.
+
+네이티브 메서드는 보통 C언어로 작성하지만, Java 로 작성하는 경우도 있다. 만약 Java로 작성하는 경우 위의 코드처럼 구현부는 없고 선언부만 있다. ( 추상 클래스 처럼 )
+네이티브 메서드는 자바로 정의되어 있기 때문에 호출하는 방법은 일반 메서드와는 같지만, 실제로 실행되는 것은 OS의 메서드이다.
+단, 위와 같이 선언만 하면 되는 것이 아니라 JNI(Java Native Interface) 를 이용하여 네이티브 메서드와 OS의 메서드를 연결해주는 작업을 해야 한다.
