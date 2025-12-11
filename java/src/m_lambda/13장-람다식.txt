@@ -78,3 +78,58 @@ Math myLambda = returnLambda(50);
 System.out.println(myLambda.Calc(5));
 
 이처럼 람다식을 참조변수로 다룰 수 있기 때문에 메서드를 통해서 함수를 주고 받을 수 있다.
+
+[ java.util.function 패키지 ]
+java.util.function 패키지는 자주 사용되는 메서드의 형식을 함수형 인터페이스로 정의해 놓았다.
+자주 사용되는 메서드를 정의해 놓았기 때문에, 코드의 중복을 줄이고 유지보수 성을 높일 수 있다.
+
+자주 사용하는 함수형 인터페이스는 다음과 같다.
+java.lang.Runnable	void run()	매개변수와 반환 값이 없다.
+Supplier<T>			T get()		매개변수는 없고, 반환 값이 있다.
+Consumer<T>			void accept(T t)	매개변수는 있고, 반환 값이 없다.
+Function<T,R>		R apply(T t) 매개변수와 반환 값이 있다.
+Predicate<T>		boolean test(T t) 조건식을 표현하는데 사용
+
+Predicate 는 Function의 변형으로 반환 타입이 boolean 이며, 조건식을 람다식으로 표현하기 위해 사용된다.
+
+- 매개 변수가 2개인 함수형 인터페이스
+매개 변수가 2개인 함수형 인터페이스는 이름 앞에 Bi 가 붙는다.
+BiConsumer<T,U>		void accept(T t, U u);
+BiPredicate<T,U>	boolean test(T t, U u);
+BiFunction<T,U,R>	R apply(T t, U u);
+
+그 이상 3개 이상의 매개 변수를 갖는 함수형 인터페이스가 필요하면 직접 선언해야 한다.
+
+- UnaryOperator와 BinaryOperator
+Function의 또 다른 변형으로 이들은 매개변수의 타입과 반환 타입이 모두 일치한다는 점을 제외하고는 Function 과 같다.
+UnaryOperator<T>	T apply(T t)
+BinaryOperator<T> 	T apply(T t, T t);
+
+
+이들을 사용하는 방법은 다음과 같다.
+Consumer<Integer> consumer = a -> System.out.println(a);
+consumer.accept(50);
+
+Supplier<String> supplier = () -> "index";
+System.out.println(supplier.get());
+
+Predicate<Integer> predicate = i -> i % 2 == 0;
+System.out.println(predicate.test(5));
+
+- 기본형을 사용하는 함수형 인터페이스
+제네릭 타입 뿐만이 아니라 기본형을 사용하는 함수형 인터페이스도 제공한다.
+
+DoubleToIntFunction	int applyAsInt(double d)	입력은 Double 타입, 출력은 Int 타입 ( 다른 타입으로도 가능 하다. )
+ToIntFunction<T>	int applyAsInt(T value)	입력은 제네릭, 출력은 int 타입
+intFunction<R>		R apply(T t, U u) 입력은 int 타입, 출력은 제네릭
+ObjIntConsumer<T>	void accept(T t, U u) 입력은 제네릭이고 출력은 없다.
+
+DoubleToIntFunction doubleToIntFunction = a -> (int) (a * 100);
+System.out.println(doubleToIntFunction.applyAsInt(5.32));
+
+# 밑에 IntUnaryOperator 는 int를 입력 받아서 int를 출력한다.
+# Integer Function<Integer> 이나, IntFunction<Integer> 보다 오토박싱&언박싱 횟수가 적어 성능이 더 좋다.
+IntUnaryOperator integerIntUnaryOperator = a -> a * a;
+System.out.println(integerIntUnaryOperator.applyAsInt(5));
+
+# 만약 매개 변수와 반환 타입이 같다면 Function 대신 UnaryOperator 를 사용하자.

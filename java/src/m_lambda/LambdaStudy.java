@@ -1,6 +1,7 @@
 package m_lambda;
 
 import java.io.FilenameFilter;
+import java.util.function.*;
 
 public class LambdaStudy {
 
@@ -25,6 +26,22 @@ public class LambdaStudy {
 
         Math myLambda = returnLambda(50);
         System.out.println(myLambda.Calc(5));
+
+
+        Consumer<Integer> consumer = a -> System.out.println(a);
+        consumer.accept(50);
+
+        Supplier<String> supplier = () -> "index";
+        System.out.println(supplier.get());
+
+        Predicate<Integer> predicate = i -> i % 2 == 0;
+        System.out.println(predicate.test(5));
+
+        DoubleToIntFunction doubleToIntFunction = a -> (int) (a * 100);
+        System.out.println(doubleToIntFunction.applyAsInt(5.32));
+
+        IntUnaryOperator integerIntUnaryOperator = a -> a * a;
+        System.out.println(integerIntUnaryOperator.applyAsInt(5));
     }
 
 }
