@@ -42,6 +42,9 @@ public class LambdaStudy {
 
         IntUnaryOperator integerIntUnaryOperator = a -> a * a;
         System.out.println(integerIntUnaryOperator.applyAsInt(5));
+
+        Function<String, Integer> fcTest = Integer::parseInt;
+        System.out.println(fcTest.apply("50"));
     }
 
 }
