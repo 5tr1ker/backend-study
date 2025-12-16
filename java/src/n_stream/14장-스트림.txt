@@ -5,3 +5,69 @@
 
 스트림을 활용하면 배열이나 컬렉션 뿐만 아니라 파일에 저장된 데이터도 모두 같은 방식으로 다룰 수 있다.
 즉, 코드의 재활용성이 높아진다는 장점을 가지고 있다.
+
+- 스트림의 특징
+1. 스트림은 데이터 소스를 변경하지 않는다.
+	ㄴ 만약 필요 시 새로운 배열을 생성해서 반환해야 한다.
+2. 스트림은 일회용이다.
+	ㄴ Iterator 처럼 한번 끝까지 돌았을 경우 닫혀서 다시 사용할 수 없다.
+3. 스트림은 내부 반복으로 처리한다.
+	ㄴ 이는 스트림에 정의된 메서드들은 for문을 메서드 내부에 숨기고 있다.
+	ㄴ forEach 같은 경우 매개변수로 람다식을 받고, 내부 for문을 통해 모든 데이터들에 대해 매개변수로 넘어온 람다식을 적용한다.
+4. 스트림의 연산
+# 스트림에 정의된 데이터 소스를 다루는 작업을 연산이라고 한다.
+스트림이 제공하는 다양한 연산을 활용해서 복잡한 작업들을 간단하게 처리할 수 있다.
+이때 스트림은 중간 연산과 최종 연산으로 분류될 수 있다.
+# 중간 연산 : 연산 결과가 스트림으로, 또 다른 중간 연산을 수행할 수 있다.
+# 최종 연산 : 연산 결과가 스트림이 아닌 연산으로, 다른 연산을 수행할 수 없다.
+# 이떄 중간 연산의 결과가 스트림이지만, 연산 전의 스트림과 같지 않다.
+5. 지연된 연산
+	ㄴ 스트림은 최종 연산이 수행되기 전까지 중간 연산을 수행하지 않는다.
+	ㄴ 즉 중간 연산만 정의할 경우 수행되지 않는다.
+6. Stream의 기본형 다루기
+Stream<Integer> 로 값을 다룰 수 있지만 오토박싱&언박싱의 비 효율을 줄이기 위해 IntStream, LongStream, DoubleStream이
+제공된다. IntStream은 int 값을 다루는데 효율적인 메서드를 제공한다.
+7. 병렬 스트림
+스트림을 활용하면 병렬 처리가 쉽다. 스트림에 parallel() 메서드를 호출하면 병렬 스트림으로 변경된다.
+반대로 병렬 스트림을 다시 순차 처리하게 하려면 sequential()을 호출하면 된다.
+# 스트림의 기본 값은 순차 처리이다.
+
+[ 스트림 생성 ]
+스트림은 배열, 컬렉션, 임의의 수 등 다양한 소스들로부터 스트림을 생성할 수 있다.
+
+- 컬렉션
+컬렉션의 최고 조상인 Collection 에는 stream()이 정의되어 있다. 그래서 이 컬렉션의 자손인 List와 Set을 구현한 모든 클래스는
+해당 메서드를 통해 스트림을 생성할 수 있다.
+하단의 stream() 메서드는 해당 컬렉션을 소스로 하는 스트림을 반환한다.
+List<Integer> list = List.of(1,2,3,4,5);
+Stream<Integer> stream = list.stream();
+stream.forEach(System.out::println);
+
+# forEach() 는 지정된 작업을, 스트림의 모든 요소에 대해 적용한다.
+
+혹은 배열을 소스로 하는 스트림을 반환하는 메서드도 제공한다.
+Stream<int[]> stream2 = Stream.of(new int[] {1,2,3,4,5});
+IntStream stream3 = Arrays.stream(new int[] {5,6,7,8});
+IntStream intStream = IntStream.of(new int[] {1,2,3,4,5});
+
+- 특정 범위의 수
+IntStream과 LongStream은 해당 범위의 연속된 숫자들을 IntStream이나 LongStream으로 반환하는 메서드가 있다.
+
+IntStream IntStream.range(int begin, int end)
+IntStream IntStream.rangeClosed(int begin, int end)
+# range 는 end 범위를 포함하지 않고, rangeClosed 는 end 범위를 포함시킨다.
+
+- 임의의 수
+난수를 생성하는 java.util.Random 클래스에는 임의의 수로 이루어진 스트림을 반환한다.
+IntStream ints();
+LongStream longs();
+DoubleStream doubles();
+
+위의 메서드는 "무한 스트림" 으로 limit() 로 크기를 정해주지 않으면 무한 난수를 반환한다.
+ints().limit(5);
+혹은 limit(5); 처럼 매개변수로 값을 제공하면 5개의 난수를 반환한다.
+# 위의 메서드들은 해당 자료형의 최소 값 ~ 최대 값을 랜덤 값으로 반환한다. ex ) int는 -21억 ~ 21억의 범위
+
+ints(int begin, int end)
+ints(int streamSize, int begin, int end)
+위의 메서드를 통해 특정 범위의 난수를 발생시킬 수 있다.
