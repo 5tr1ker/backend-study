@@ -71,3 +71,75 @@ ints().limit(5);
 ints(int begin, int end)
 ints(int streamSize, int begin, int end)
 위의 메서드를 통해 특정 범위의 난수를 발생시킬 수 있다.
+
+- 람다식의 iterate(), generate()
+iterate()와 generate()는 매개변수로 전달받은 람다식의 연산 결과를 다시 요소로 활용하는 "무한 스트림" 을 생성한다.
+
+Stream<T> iterate(T seed, UnaryOperator<T> f)
+iterate는 초기 값인 seed 을 시작으로, 람다식 f 에 의해 나온 값을 다시 seed 로 활용한다.
+Stream.iterate(5, a -> a + 2).limit(5).forEach(System.out::println);
+
+Stream<T> generate(Supplier<T> s)
+generate도 람다식 s 의 결과를 다시 요소로 활용하는 "무한 스트림" 을 반환하지만, iterate 와는 달리 이전 요소를 활용하지 않는다.
+또한 Supplier 이므로 매개변수가 없는 람다식을 제공해야 한다.
+
+- 빈 스트림
+요소가 하나도 없는 스트림은 아래의 코드를 통해 생성할 수 있다.
+연산 결과가 하나도 없을 때 null 보다 비어있는 스트림이 나을 것이다.
+
+Stream empty = Stream.empty();
+long size = empty.count(); // size의 값은 0이 될것이다.
+
+- 스트림 연결 concat()
+Stream<Integer> stream_1 = Stream.iterate(0, a -> a + 2).limit(5);
+Stream<Integer> stream_2 = Stream.generate(() -> 2);
+Stream<Integer> stream_3 = Stream.concat(stream_1, stream_2);
+
+2개의 스트림은 서로 연결될 수 있다. 이때 두 요소의 타입은 같아야 한다.
+
+[ 스트림의 중간 연산 ]
+스트림 자르기 - skip() , limit()
+skip() 과 limit() 는 스트림에 있는 요소를 잘라낼 때 사용된다.
+
+Stream<T> skip(long n)
+Stream<T> limit(long maxSize)
+
+skip(n)은 요소의 첫 N개를 건너뛰고, limit(n) 는 요소를 n개로 제한한다.
+
+스트림 요소 걸러내기 - filter() , distinct()
+distinct() 는 중복을 제거하는데 사용되며, filter() 는 주어진 조건에 맞지 않는 요소들을 제거한다.
+
+Stream<T> filter(Predicate<? Super T> predicate);
+Stream<T> distinct();
+
+filter는 Predicate 인 조건식을 매개변수로 넘겨주면 되며, 해당 조건식이 true인 요소들만 남긴다.
+필요한 경우 filter는 여러개 사용해도 된다.
+
+stream_3 = stream_3.distinct().filter(a -> a % 2 == 0);
+stream_3.forEach(System.out::println);
+
+- 정렬 sorted()
+스트림을 정렬할 땐 sorted를 활용하면 된다.
+sorted()는 지정된 Comparator 로 정렬하는 것도 가능하며, 결과 값이 int 인 람다식도 사용 가능하다.
+Comparator 를 지정하지 않으면, 기본 정렬 방식인 Comparable 을 기준으로 정렬하는데, Comparable 가 구현되어 있지 않으면
+예외가 발생한다.
+
+sort(Comparator.comparing(Student::getBan) // 만약 기본형인 경우 comparingInt 를 사용하면 좋다.
+	.thenComparing(Student::getScore)
+	.thenComparing(Student::getName)
+위의 코드는 정렬에 기본적인 메서드인 comparing 을 사용하여 정렬한다.
+추가 정렬 기준을 제공할 땐 thenComparing 를 사용한다.
+
+- 변환 map()
+스트림 요소 값을 변환하기 위해 사용한다.
+map()은 저장된 요소 값 중에서 특정 필드만 추출하거나, 특정 형태 ( 소문자를 대문자 ) 로 바꾸어야 할 때 사용된다.
+
+Stream<R> map(Function<? super T,? extends R> mapper)
+
+예를 들어 File 클래스를 요소로 하는 스트림에서 File의 이름만 추출할 때 사용할 수 있다.
+이때 Stream<File> 의 결과 값은 Stream<String> 이 된다.
+# ex) file.map(File::getName)
+
+- 조회 peek()
+peek()는 forEach()와 달리 중간 연산자로 반환 값이 Stream 이다.
+filter 와 map 의 중간 연산 결과를 확인할 때 사용된다.
