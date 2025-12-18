@@ -143,3 +143,25 @@ Stream<R> map(Function<? super T,? extends R> mapper)
 - 조회 peek()
 peek()는 forEach()와 달리 중간 연산자로 반환 값이 Stream 이다.
 filter 와 map 의 중간 연산 결과를 확인할 때 사용된다.
+
+- mapToInt() , mapToLong() , mapToDouble()
+map의 연산 결과는 Stream<T> 으로, 만약 Stream<Integer> 으로 변환해야 한다면 IntStream 를 사용하는 것이 더 효율적이다.
+이러한 기본형 스트림으로 변환해주는 메서드들이 mapToInt() , mapToLong() , mapToDouble() 이다.
+# Stream<Integer> 의 경우 오토박싱&언박싱으로 인해서 성능이 저하될 수 있다.
+
+위의 메서드들은 int sum() , OptionalInt min() , OptionalInt max() , OptionalDouble average() , IntSummaryStatistics summaryStatistics() 처럼, 정수형을 다루는데 편리한 메서드들을 제공한다.
+그리고 이 메서드들은 최종 연산이기 때문에 이 메서드를 사용 후에 스트림은 닫힌다.
+# sum()은 요소가 없을 때 0을 반환하지만, min 과 max, average 는 요소가 있어도 0 이 나올 수 있기 떄문에 이를 구분하기 위해 Optional 을 쓴다.
+# 위의 메서드들은 IntStream 의 기준으로, DoubleStream 과 LongStream 도 메서드를 제공한다. ( 반환 타입은 다름 )
+
+- flatMap() Stream<T[]> 을 Stream<T> 으로 변환
+스트림의 요소가 Stream<T[]> 인 경우 Stream<T> 으로 변환하기 위해서 flatMap을 사용할 수 있다.
+보통 Stream<String[]> 을 Stream<String> 으로 , Stream<Stream<String>> 을 Stream<String> 으로 변환하기 위해 사용한다.
+
+Stream<String[]> flatMapStream = Stream.of(
+	new String[] {"hello" , "nice" , "to" , "meet" , "you"},
+	new String[] {"my" , "name" , "is" , "chicky~"}
+);
+Stream<String> newFlatMapStream = flatMapStream.flatMap(Arrays::stream);
+
+# 위의 Arrays.stream 은 배열을 Stream 으로 바꾼다.

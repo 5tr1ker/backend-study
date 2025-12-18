@@ -44,6 +44,11 @@ public class StreamStudy {
         stream_3 = stream_3.distinct().filter(a -> a % 2 == 0);
         stream_3.forEach(System.out::println);
 
+        Stream<String[]> flatMapStream = Stream.of(
+                new String[] {"hello" , "nice" , "to" , "meet" , "you"},
+                new String[] {"my" , "name" , "is" , "chicky~"}
+        );
+        Stream<String> newFlatMapStream = flatMapStream.flatMap(Arrays::stream);
 
     }
 
