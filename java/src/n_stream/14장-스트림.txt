@@ -165,3 +165,85 @@ Stream<String[]> flatMapStream = Stream.of(
 Stream<String> newFlatMapStream = flatMapStream.flatMap(Arrays::stream);
 
 # 위의 Arrays.stream 은 배열을 Stream 으로 바꾼다.
+
+[ Optional<T> 와 OptionalInt ]
+Optional<T> 은 제네릭 클래스로, T 타입의 객체를 감싸는 래퍼 클래스이다.
+Optional 클래스 내부에 정의된 메서드를 활용하여 NullPointException에 안전한 코드를 작성할 수 있다.
+
+- Optional 객체 생성
+Optional.of(T data) : Optional 객체를 생성한다. 만약 매개변수 값이 null 일 경우 NullPointException를 발생시킨다.
+Optional.ofNullable() : Optional 객체를 생성한다.
+Optional.empty() : 기본값으로 초기화한 Optional 객체 생성
+
+- Optional 값 가져오기
+System.out.println(optional.get())	: Optional 객체 내부에 저장된 값을 가져온다. 값이 없다면 NoSuchElementException 이 발생한다.
+System.out.println(optional2.orElse("empty String")) : Optional 객체 내부에 저장된 값을 가져온다. 값이 없을 경우 매개변수로 전달된 값을 제공한다.
+
+System.out.println(optional2.orElseGet(() -> "default String"))	: 값이 없을 경우 람다식에 지정된 값을 가져온다.
+System.out.println(optional2.orElseThrow(NullPointerException::new)) : 값이 없을 경우 지정된 예외를 발생시킨다.
+
+# 하단에서 처럼 Optional 도 Stream 처럼 map이나 flatMap, filter 를 적용할 수 있다.
+String result = optional.map(String::toUpperCase).orElse("default String");
+
+Optional.isPresent() : 객체 내부의 값이 null 이면 false, 있으면 true 를 반환한다.
+if(!emptyOptional.isPresent()) {
+	system.out.println("is empty");
+}
+
+optional.ifPresent(System.out::println) : Optional 객체 내부의 값이 존재한다면 내부 값을 출력한다.
+
+- OptionalInt , OptionalDouble , OptionalLong
+IntStream 과 같은 기본형 스트림은 기본형을 값으로 하는 OptionalInt 을 반환한다.
+이는 Stream에서 제공하는 메서드 중 반환 타입이 다르다는 것을 제외하면 비슷하다.
+
+그리고 OptionalInt 에서 값을 가져오는 메서드도 조금씩 다르다.
+Optional 클래스의 값을 가져오는 메서드는 get() 이지만 , OptionalInt 의 값을 가져오는 메서드는 getAsInt() 이다.
+OptionalLong 의 값을 가져오는 메서드는 getAsLong , OptionalDouble 은 getAsDouble 이 된다.
+
+OptionalInt optionalInt = OptionalInt.of(0);
+System.out.println(optionalInt.getAsInt());
+
+# 기본형 스트림은 기본 값이 0 이기 떄문에 값이 없는 것과 0 인 것에 대한 차이는 isPresent 변수로 구분한다.
+
+[ 최종 연산 스트림 ]
+최종 연산은 스트림 요소를 소모하며 결과를 만들어 내기 때문에 다른 스트림을 호출할 수 없다.
+최종 연산의 결과로는 단일 값 혹은 배열일 수도 있다..
+
+- forEach()
+void forEach() 는 최종 연산으로 반환 값은 void 이다.
+그렇기 때문에 보통 출력을 위해서 사용한다.
+
+- allMatch(), anyMatch() , noneMatch() , findFirst() , findAny()
+스트림의 요소 중 주어진 조건에 일치하는 요소가 있는지 확인한다.
+allMatch 와 anyMatch , noneMatch 는 매개변수로 Predicate 메서드를 받으며 결과로는 boolean을 반환한다.
+이 메서드들은 요소들이 모두 해당 조건에 만족하는지 , 아니면 해당 조건에 만족하는 요소가 하나라도 있는지, 하나도 없는지 나타낸다.
+
+findFirst() 는 조건에 일치하는 요소 중 첫번 째 요소를 반환하며, 주로 filter()와 함께 사용된다.
+병렬 스트림의 경우 findAny()를 사용한다.
+이 메서드들은 연산 결과라 Optional<> 로 결과가 빈값이면 빈 Optional 을 반환한다.
+
+- 통계 count() , sum() , average() , min() , max()
+IntStream과 같은 기본형 스트림은 요소에 대한 통계 정보를 알 수 있는 메서드들을 제공한다.
+
+일반 Stream인 경우 통계와 관련된 메서드는 count() , min() , max() 밖에 없다.
+보통 통계 정보를 얻기 위해서 기본형 스트림으로 변환하거나 reduce() 나 collect() 를 사용한다.
+
+- reduce() 리듀싱
+리듀싱은 스트림에 있는 요소를 줄여가면서 연산을 수행하고 최종 결과를 반환한다.
+처음 두 요소를 연산하고, 그 결과를 가지고 다음 요소를 가지고 연산을 수행한다.
+
+Optional<t> reduce(BinaryOperator<T> accumulator)
+
+T reduce(T identity, BinaryOperator<T> accumulator);
+U reduce(U identity, BiFunction<U,T,V> accumulator, BinaryOperator<U> combiner);
+그 외에도 초기값을 가지는 reduce() 가 있는데, 이는 초기 값을 기준으로 스트림의 첫번 째 요소와 연산을 수행한다.
+만약 요소가 비어 있으면 초기 값을 반환한다.
+
+# combiner 는 병렬 스트림에 의해 처리된 결과를 합칠 때 사용한다.
+
+위의 통계 메서드 count() 나 sum() 등은 이러한 reduce() 를 통해서 구현된 것이다.
+
+int[] maps = {1,2,3,4,5};
+IntStream intStream = Arrays.stream(maps);
+int result = intStream.reduce(0 , (a , b) -> a + b);
+System.out.println(result);
