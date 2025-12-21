@@ -247,3 +247,114 @@ int[] maps = {1,2,3,4,5};
 IntStream intStream = Arrays.stream(maps);
 int result = intStream.reduce(0 , (a , b) -> a + b);
 System.out.println(result);
+
+- collect()
+collect() 는 스트림의 요소를 특정 기준으로 수집하는 최종 연산이다.
+collect() 가 어떤 기준으로 요소를 수집할 것인지 기준을 세우는 것이 collector이다.
+collector 는 Collector 인터페이스를 구현한 것이며, Collectors 클래스는 미리 작성된 다양한 collector 들을 static 메서드로 제공한다.
+
+- collect() : 스트림의 메서드
+- Collector : 인터페이스로 컬렉터는 해당 인터페이스를 구현해야 한다.
+- Collectors : static 메서드로 미리 정의된 컬렉터들을 제공한다.
+
+collect() 는 매개변수로 Collector 객체를 요구한다.
+Object collect(Collector collector);
+
+- 스트림을 컬렉션과 배열로 반환 toList() , toSet() , toMap() , toCollection() , toArray()
+스트림에 모든 요소를 컬렉션에 수집하려면 Collectors 클래스의 toList() 메서드를 활용하면 된다.
+만약 특정 컬렉션에 저장하고 싶다면 toCollection 메서드에 해당 컬렉션의 생성자 참조를 매개변수에 제공하면 된다.
+
+List<Integer> streamToList = streamer.collect(Collectors.toList());
+ArrayList<Integer> streamToArrayList = streamer.collect(Collectors.toCollection(ArrayList::new));
+
+Map 같은 경우 키와 값을 하나의 쌍으로 지정해야 하므로, 데이터 중 어떤 필드를 키와 값으로 지정할 것인지를 지정해야 한다.
+Map<String, Integer> map = streamer.collect(Collectors.toMap(p -> p + "" , p -> p));
+
+스트림의 요소를 배열로 변환하려면 toArray() 를 사용하면 된다.
+이때 해당 타입의 생성자 참조를 매개변수로 지정해야 한다. 그렇지 않으면 반환 타입은 Object[] 가 된다.
+Object[] resource = streamer.toArray();
+Integer[] resource_2 = streamer.toArray(Integer[]::new);
+
+- 통계 counting() summingInt() , averagingInt() , maxBy() , minBy()
+
+다른 최종 연산들이 제공하는 통계 메서드를 collect() 에서도 제공한다.
+
+int sum_test = streamer.collect(Collectors.summingInt(Integer::intValue));
+System.out.println(sum_test);
+
+단순히 통계 데이터만 필요할 때 다른 최종 연산자인 sum() 을 사용하지만, 해당 메서드들은 groupingBy() 와 함께 사용된다.
+groupingBy() 을 사용하지 않는다면 굳이 귀찮게 collect() 를 써가면서 까지 사용할 필요는 없다.
+
+- 리듀싱 - reducing()
+collect 에서도 리듀싱이 가능하다. 단 IntStream 은 boxed() 를 통해 Stream<Integer> 로 변환해서 사용해야 매개변수 1개짜리 collect()를 사용할 수 있다.
+# IntStream 에는 매개변수 3개짜리 collect() 밖에 없다.
+
+int sum_test = streamer.collect(Collectors.reducing((a, b) -> a + b)).get();
+int sum_test = streamer.collect(Collectors.reducing(0, (a, b) -> a + b));
+
+- 문자열 결합 - joining()
+문자열 스트림에 모든 요소를 결합하여 하나의 문자열로 반환한다.
+이때 스트림의 요소가 CharSequance 의 자손인 경우에만 결합이 가능하므로 ( String , StringBuffer 등등.. ) map() 을 통해서 문자열로 반환해야 한다.
+그렇지 않으면 toString()을 통해 나온 문자열을 기반으로 결합을 진행한다.
+
+# 아래 예제처럼 구분자와 접미사, 접두사를 지정해줄 수 있다.
+String result_2 = streamer.map(String::valueOf).collect(Collectors.joining("," ,"[" , "]"));
+System.out.println(result_2);
+
+[ 그룹화와 분할 - groupingBy , partitioningBy ]
+그룹화인 groupingBy는 스트림의 요소를 특정 기준으로 그룹화하는 것을 의미하고, 분할ㅇ은 스트림의 요소를 2가지 ( 지정된 조건에 만족하는 그룹과 그렇지 않은 그룹 ) 으로 분할한다.
+groupingBy 는 Function 으로 , partitioningBy는 Predicate 로 분류한다
+# 사실 분류를 Function 으로 하냐 , Predicate 로 하냐의 차이만 있을 뿐이다.
+
+스트림을 2개의 그룹으로 나누어야 한다면 partitioningBy 을 사용하는 것이 더 빠르며, 그렇지 않은 경우는 groupingBy 를 사용하는 것이 낫다.
+그룹화와 분할의 결과는 Map에 담겨 반환한다.
+
+- partitioningBy 에 의한 분류
+
+# 짝수, 홀수로 분류
+Map<Boolean, List<Integer>> result_grouping= streamer.collect(Collectors.partitioningBy(x -> x % 2 == 0));
+System.out.println(result_grouping); // {false=[1, 3, 5, 41, 21, 51], true=[2, 4, 10, 62]}
+
+# 해당 요소의 개수
+Map<Boolean, Long> result_grouping= streamer.collect(Collectors.partitioningBy(x -> x % 2 == 0,
+                Collectors.counting()
+)); // {false=6, true=4}
+
+# 해당 요소의 최대값
+Map<Boolean, Integer> result_grouping= streamer.collect(Collectors.partitioningBy(x -> x % 2 == 0,
+	Collectors.collectingAndThen(Collectors.maxBy(Integer::compareTo), Optional::get)
+)); // {false=51, true=62}
+
+# 이중 분할 ( 짝수 홀수 / 30 이상인지 아닌지 )
+Map<Boolean, Map<Boolean, List<Integer>>> result_grouping= streamer.collect(Collectors.partitioningBy(x -> x % 2 == 0,
+	Collectors.partitioningBy(x -> x > 30)
+)); // {false={false=[1, 3, 5, 21], true=[41, 51]}, true={false=[2, 4, 10], true=[62]}}
+
+- groupingBy 에 의한 분류
+
+# 1 , 2 , 3 의 배수로 나누기
+Map<Integer, List<Integer>> result_grouping = streamer.collect(
+        Collectors.groupingBy((a) -> a % 3 , Collectors.toList())
+);
+System.out.println(result_grouping); // {0=[3, 21, 51], 1=[1, 4, 10], 2=[2, 5, 41, 62]}
+
+# 몇의 배수인지 문자열로 나타내기.
+Map<String, List<Integer>> result_grouping = streamer.collect(
+                Collectors.groupingBy(s -> {
+                    if(s % 3 == 0) return "3의 배수";
+                    if(s % 3 == 1) return "1의 배수";
+                    if(s % 3 == 2) return "2의 배수";
+                    return "";
+                } , Collectors.toList())
+        );
+        System.out.println(result_grouping); // {2의 배수=[2, 5, 41, 62], 3의 배수=[3, 21, 51], 1의 배수=[1, 4, 10]}
+
+
+# 3의 배수로 분류 후 2의 배수로 분류하기
+        Map<Integer, Map<Integer, List<Integer>>> result_grouping = streamer.collect(
+                Collectors.groupingBy((a) -> a % 3 ,
+                        Collectors.groupingBy((a) -> a % 2 , Collectors.toList()))
+        );
+        System.out.println(result_grouping); // {0={1=[3, 21, 51]}, 1={0=[4, 10], 1=[1]}, 2={0=[2, 62], 1=[5, 41]}}
+
+[ Collector의 구현 ]
