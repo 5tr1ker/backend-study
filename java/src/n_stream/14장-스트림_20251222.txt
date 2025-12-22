@@ -358,3 +358,17 @@ Map<String, List<Integer>> result_grouping = streamer.collect(
         System.out.println(result_grouping); // {0={1=[3, 21, 51]}, 1={0=[4, 10], 1=[1]}, 2={0=[2, 62], 1=[5, 41]}}
 
 [ Collector의 구현 ]
+컬렉터를 만든다는 것은 Collector 인터페이스를 구현하는 것을 말한다. Collector 인터페이스를 구현하려면 아래 5가지 메서드를 구현해야 한다.
+supplier() : 수집 결과를 저장할 공간을 제공
+accumulator() : 스트림의 요소를 어떻게 수집할 것인지 제공 ( 저장은 supplier 의 공간에 적재 )
+conbuner() : 병렬 스트림인 경우 여러 쓰레드가 작업한 결과를 어떻게 합칠 것인가
+finisher() : 작업 결과를 어떻게 변환할 것인가 ( 만약 변환을 안한다면 항등 함수를 제공 )
+characteristics() : 컬렉터가 수행하는 작업에 대한 속성을 제공한다. ( Set 컬렉션에 아래의 내용을 담아 제공 )
+	ㄴ Characteristics.CONCURRENT : 병렬 처리가 가능한 작업
+	ㄴ Characteristics.UNORDERED : 스트림 요소의 순서가 유지될 필요가 없는 작업
+	ㄴ Characteristics.IDENTITY_FINISH : finisher() 가 항등 함수인 작업
+# Characteristics 의 경우 해당 하는 것이 없다면 Collections.emptySet(); 을 통해 빈 Set 을 반환하면 된다.
+# Characteristics 의 경우 Set을 반환 하지만, 나머지 4개 메서드는 모두 함수형 인터페이스를 반환해야 한다.
+
+- reduce() vs collect()
+reduce() 와 collect() 는 근본적으로 같지만, collect() 는 그룹화와 분할, 집계 등에 사용되며 병렬화를 하는데 유용하게 사용된다.
