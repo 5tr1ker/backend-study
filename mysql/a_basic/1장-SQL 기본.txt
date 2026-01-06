@@ -1,0 +1,43 @@
+[ WITH절과 CTE ]
+
+WITH 절은 CTE를 표현하기 위한 구문으로 MySQL 8.0 부터 사용할 수 있게 되었다.
+CTE는 Common Table Expression 의 약자로 뷰나 테이블을 대신하여 구문을 단순하게 해준다.
+CTE에는 비재귀적CTE와 재귀적CTE 2가지가 있는데 주로 비재귀적CTE를 주로 사용한다.
+
+- 비재귀적 CTE
+말 그대로 재귀적이지 않은 CTE 이며, 단순한 형태이다.
+복잡한 쿼리를 단순화시키는데 사용된다.
+
+WITH CTE_테이블이름(열 이름)
+AS 
+(
+	<쿼리문>
+)
+SELECT 열 이름 FROM CTE_테이블이름;
+
+
+WITH abc(name, amount)
+AS 
+(
+	select name , sum(amount) from buytbl group by name
+)
+select * from abc;
+
+위의 쿼리에서 abc는 실제로 존재하는 테이블이 아닌 WITH 구문에서 만든 SELECT 의 결과다.
+다만, AS 내부에 select 한 열의 갯수와 WITH 테이블 이름의 열 갯수랑 일치해야 한다.
+
+WITH 절과 CTE는 복잡한 쿼리를 단계적으로 풀어나갈 때 사용한다.
+그리고 뷰와 다른점은 뷰는 계속 존재하여 다른 구문에서 활용할 수 있지만, CTE는 파생 테이블의 구문이 끝나면 소멸한다.
+즉, 일회용이 된다.
+
+또한 CTE는 중복으로 사용 가능하다. CTE 안에 CTE 를 넣어서 구현할 수 있다.
+ex)
+WITH CTE_테이블이름(열 이름)
+AS 
+(
+	WITH CTE_테이블이름(열 이름)
+	AS 
+	(
+		<쿼리문>
+	)
+)
