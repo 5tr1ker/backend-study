@@ -51,3 +51,20 @@ select * from tab_myisam;
 select * from tab_innodb;
 
 SELECT GET_LOCK('mylock', 2000);
+
+SELECT GET_LOCK('mylock', 20000);
+select IS_FREE_LOCK('mylock');
+select RELEASE_LOCK('mylock');
+
+
+select * from buytbl;
+
+show processlist;
+
+select * from 
+
+update employees set birth_date=now() where emp_no=100001;
+
+update employees set hire_date=now() where emp_no=100001;
+
+update employees set birth_date=now() , hire_date=now() where emp_no=100001;
