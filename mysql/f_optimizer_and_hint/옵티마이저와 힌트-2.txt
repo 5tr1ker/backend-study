@@ -13,3 +13,6 @@
 3. index_merge_union
 
 index_merge 옵티마이저 옵션은 위의 3가지 옵션을 모두 제어할 수 있다.
+
+
+[]
