@@ -1,2 +1,0 @@
-# backend-study
-backend-study
