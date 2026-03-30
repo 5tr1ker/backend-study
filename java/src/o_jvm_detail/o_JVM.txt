@@ -1,0 +1,36 @@
+# 내용 참고
+1. https://inpa.tistory.com/entry/JAVA-%E2%98%95-JDK-JRE-JVM-%EA%B0%9C%EB%85%90-%EA%B5%AC%EC%84%B1-%EC%9B%90%EB%A6%AC-%F0%9F%92%AF-%EC%99%84%EB%B2%BD-%EC%B4%9D%EC%A0%95%EB%A6%AC#java%EC%9D%98_%EC%8B%A4%ED%96%89_wora
+2. https://inpa.tistory.com/entry/JAVA-%E2%98%95-JVM-%EB%82%B4%EB%B6%80-%EA%B5%AC%EC%A1%B0-%EB%A9%94%EB%AA%A8%EB%A6%AC-%EC%98%81%EC%97%AD-%EC%8B%AC%ED%99%94%ED%8E%B8#jni_java_native_interface
+
+
+[ JDK 와 JRE ]
+JDK는 Java Development Kit 의 약자로 자바를 개발하는데 필요한 키트가 포함되어 있다.
+여기서는 자바를 실행시키기 위한 Java Runtime Environment 도 함께 포함되어 있다.
+
+JRE 는 Java Runtime Environment 의 약자로 자바를 실행시키기 위한 패키지를 가지고 있다.
+개발이 아닌 실행만 시키기 위한 최소한의 패키지를 가지고 있다.
+
+[ JVM 이란 ]
+JVM 은 Java Virtual Machine 의 약자로, 기존 OS에 종속적인 문제를 해결하기 위한 개념이다.
+JVM 을 사용하지 않는 C 언어는 각 운영체제 ( 리눅스 , 맥 , 윈도우 ) 에 맞게 별도로 컴파일을 해야하며, 환경에 따라 소스코드의 일부를 수정할 수도 있다.
+JVM 은 이러한 단점을 개선시켜준다. JVM 위에서 동작하는 Java는 서로 다른 운영체제라 하더라도 소스코드를 수정하지 않아도 된다.
+
+물론 JVM은 OS 별로 구현되기 때문에 OS에 맞는 JVM 을 설치할 수 있어야 한다.
+JVM은 C 언어와 달리 컴파일과 변환을 수행하기 떄문에 C 언어보다 느리다는 단점을 가지고 있다. ( 물론 이는 JIT 컴파일러의 등장으로 C언어와의 격차는 줄어들었지만, 여전히 C언어가 더 빠르다. )
+JVM위에 동작하는 JAVA 는 우선 .java 소스 코드를 .class 파일로 컴파일 하고 ( 바이트 코드 ) 이후 기계어인 바이너리 코드로 변환 하는 단계를 거치게 된다.
+.java 소스 코드를 .class 파일로 컴파일 하는 것은 javac.exe 프로그램이 담당한다. ( 바이트 코드로 컴파일 - 자바 컴파일러 )
+java.exe 프로그램은 JVM 을 실행시키며, 바이트 코드를 인터프리터 방식으로 실행시키거나, JIT 컴파일러를 통해 기계어인 바이너리 코드로 변환하여 실행한다. ( 기계어 변환 - JVM )
+    ㄴ 기본적으로 인터프리터 방식이며, 성능 향상을 위해 일부는 JIT 컴파일로 최적화
+
+자바 코드를 바이트 코드로 변환하는 것은 자바 컴파일러가 담당하며,
+바이트 코드를 실제 운영체제에서 실행하는 것은 JVM 이 담당한다.
+
+[ JVM 의 내부 구조 & 실행 구조 ]
+JVM 은 클래스 로더를 통해 자바 어플리케이션을 읽고 자바 API와 함께 실행된다.
+우선 자바 소스 파일이 어떻게 실행되는지 구성은 다음과 같다.
+
+0. JVM 은 OS로 부터 메모리를 할당 받는다.
+1. 자바 컴파일러가 자바 소스코드 .java 를 바이트 코드 ( .class ) 로 컴파일한다.
+2. Class Loader 는 동적 로딩을 통해 필요한 클래스들을 로딩 및 링크하여 Runtime Data Area 에 올린다.
+3. Runtime Data Area 에 로딩된 바이트 코드는 Execution Engine 을 통해 해석된다.
+4. 3번의 과정에서 Execution Engine 에 의해 GC 작동과 Thread 동기화가 이루어 진다.

@@ -1,4 +1,4 @@
-package o_jvmtest;
+package o_jvm_detail;
 
 public class JvmTest {
 
@@ -15,7 +15,7 @@ public class JvmTest {
     }
 
     private void heapArea() {
-        
+
     }
 
 }
