@@ -2,3 +2,65 @@
 
 # https://inpa.tistory.com/entry/JAVA-%E2%98%95-%EA%B0%80%EB%B9%84%EC%A7%80-%EC%BB%AC%EB%A0%89%EC%85%98GC-%EB%8F%99%EC%9E%91-%EC%9B%90%EB%A6%AC-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%F0%9F%92%AF-%EC%B4%9D%EC%A0%95%EB%A6%AC
 # https://inpa.tistory.com/entry/JAVA-%E2%98%95-%EA%B0%80%EB%B9%84%EC%A7%80-%EC%BB%AC%EB%A0%89%EC%85%98-GC-%ED%8A%9C%EB%8B%9D-%EB%A7%9B%EB%B3%B4%EA%B8%B0
+
+[ 가비지 컬렉션이란? ]
+GC는 JAVA 의 메모리 관리 방법중 하나로 Heap 영역에 동적으로 할당된 메모리 중 더이상 사용하지 않는 객체를 제거하는 프로세스이다.
+C / C++ 언어와 다르게 개발자는 더이상 사용하지 않는 객체를 직접 해제하지 않아도 된다.
+
+하지만 가비지 컬렉션은 자동으로 실행되기 때문에 언제 메모리가 언제 해제되는지 정확한 시간을 알 수 없으며,
+가비지 컬렉션이 동작하는 동안에 다른 동작이 멈추는 Stop the World 가 발생한다.
+만약 GC가 자주 발생하게 되면, 소프트웨어의 성능을 저하시킬 수 있다.
+
+***
+# - Stop-The-World
+# JVM이 GC를 수행하기 위해 다른 작업을 멈추는 현상을 의미한다.
+# JVM 은 GC를 수행하기 위해 GC 관련 쓰레드를 제외한 모든 쓰레드를 멈추게 되며, 이는 서비스 이용에 영향을 줄 수 있다.
+***
+
+따라서 어플리케이션의 사용성을 유지하면서, 효율적으로 GC를 수행하게 하는 GC 최적화 작업인 GC 튜닝이 중요하다.
+
+[ 가비지 컬렉션 대상 ]
+JVM은 Garbage 대상을 판단하기 위해서 도달성, 도달능력 ( Reachability ) 이라는 개념을 적용한다.
+객체가 참조되고 있다면 Reachable , 객체가 참조되고 있지 않은 상태라면 Unreachable 로 구분한다. 이때 Unreachable 이 GC 대상이다.
+# Unreachable : 접근 불가 상태 / Reachable : 접근 가능 상태
+
+더 구체적으로, Heap Area 에 생성된 객체는 Method Area 이나, Stack Area 에서 해당 객체의 메모리 주소를 참조하게 된다.
+하지만 메서드의 종료와 같은 이벤트로 Heap Area 에 있는 객체의 메모리 주소를 참조하는 참조 변수가 삭제되면, Unreachable 상태가 되는데
+이때 이러한 객체들이 GC 대상이 되는 것이다.
+
+[ 가비지 컬렉션 방식 Mark-And-Sweep ]
+Mark-And-Sweep 는 사용하고 있는 객체를 솎아내는 내부 알고리즘이다.
+즉, Root Space 로부터 해당 객체에 접근할 수 있는지 확인하며, 접근할 수 없으면 제거한다.
+해당 방식은 가비지 컬렉션이 될 대상을 식별(Mark) 하고, 제거 (Sweep) 한 다음 파편화된 메모리 영역을 시작 지점으로 채워나가는 작업(Compact)을 수행한다.
+
+Mark : Root Space 부터 시작하여 그래프 순회를 통해 연결된 객체 ( 참조하는 객체 ) 를 찾는다.
+Sweep : Unreachable 객체를 제거한다.
+Compact : Sweep 후 분산된 객체들을 Heap 의 시작주소로 모은다. ( 이는 GC 종류에 따라 하지 않을 수 있다. )
+# 여기서 Root Space 는 Method Area , Stack Area , Native Method Stack , Static 변수 가 된다.
+# Method Area 의 Static 변수 / Native Method Stack 의 JNI 참조
+
+[ 가비지 컬렉션 동작 과정 ]
+JVM 에서의 Heap Area에 저장되는 객체들은 대부분 일회성이며, 오랫동안 살아있는 객체는 드물다.
+이러한 특성을 활용해 Heap 영역을 물리적으로 Young 영역과 Old 영역으로 나누었다.
+
+- Young 영역
+새롭게 생성되는 객체들이 할당되는 공간이며, 대부분의 객체들은 해당 영역에서 사라진다.
+Young 영역에 대한 가비지 컬렉션은 Minor GC 라고 부른다.
+
+- Old 영역
+Young 영역에서 Reachable 상태를 유지한 객체가 복사되는 공간이다.
+Young 영역보다 크기가 더 크게 할당되며, 가비지 컬렉션은 적게 발생된다.
+Old 영역에 대한 가비지 컬렉션은 Major GC 또는 Full GC 라고 부른다.
+
+# Old 영역이 Young 영역보다 큰 이유는, 보통 Young 영역은 생명 주기가 짧은 객체들은 큰 공간이 필요하지 않으며, 큰 객체는 바로 Old 영역으로 할당되기 때문이다.
+
+또한 Young 영역은 3가지 영역으로 나뉜다. ( Eden , survivor 0 , survivor 1 )
+
+- Eden
+New 연산자를 통해 생성된 객체가 위치하며, 정기적인 가비지 컬렉션에서 살아남은 객체들은 survivor 영역으로 이동된다.
+
+- Survivor 0 / Survivor 1
+최소 1번 이상의 GC에서 살아남은 객체가 위치하며, Survivor 0 과 1 중 한 부분은 반드시 비워져 있어야 한다.
+
+# 이렇게 힙 영역을 세부적으로 쪼갬으로써 가비지 컬렉터가 정확히 불필요한 객체만 제거하게 한다.
+# 이때 각 분할된 부분은 객체의 생명주기를 면밀하게 관리한다.
