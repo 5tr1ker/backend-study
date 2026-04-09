@@ -24,3 +24,89 @@ G1GC에서는 GC 용어는 살짝 다르다.
 Young GC = Eden + Survivor ( Young 대상으로만 하는 GC )
 Mixed GC = Old + Young ( Young 과 Old 대상으로 하는 GC )
 Full GC = Heap 전체
+
+- G1GC 의 GC 방식
+G1GC는 기존 방식과 다르게 전체 메모리를 대상으로 GC 하는 것이 아니라 Region 별로 GC를 수행한다.
+이때 한 Region 에 있는 메모리들은 다른 Region 으로 옮겨질 수 있다. 물론 메모리 이동 순서에 어긋나지 않아야 한다.
+# 메모리 이동 순서란 Survivor0 이 Eden 영역으로 가거나, Old 영역에서 Young 영역으로 가지 않는다.
+
+G1GC도 GC를 수행할 때 어플레케이션이 멈추는 Stop the World 가 발생한다.
+대신 기존 다른 GC와는 다르게 Stop-The-World 의 시간이 짧아진 대신에 GC 발생 횟수는 길다.
+그리고 GC가 언제 발생하는지 예측을 할 수 있다.
+
+어떻게 예측하냐면, G1GC는 "목표 시간 ( Pause Time)"을 기준으로 GC를 스스로 계획한다.
+G1GC에는 Pause 목표 시간이라는 옵션이 존재한다.
+-XX:MaxGCPauseMillis=200 # GC의 시간을 200ms 를 넘지 않게 하라 ( 물론 살짝 넘을 수 있다. )
+
+G1은 각 Region 마다 GC를 수행하는데 시간이 얼마나 걸리는지 계산을 한다.
+그 후 여러 Region 을 선택하여 각각의 Region 들의 gc 시간의 합을 MaxGCPauseMillis 시간과 가깝게 설계한다.
+이런 방식을 통해 기존 GC가 언제 끝날지 모르는 단점을 어느정도 해소할 수 있다.
+
+이러한 장점은 Old Generation 에서 빛을 발한다.
+기존 GC 구조는 Old Generation 영역이 고정적이고 커서 모든 메모리를 검색하고 삭제하는데 많은 시간이 든다.
+하지만 G1은 Region이 나누어져 있으며, Mixed GC를 통해 Old Gen의 일부 영역만 GC할 수 있으니 효율적인 메모리 관리를 할 수 있는 것이다.
+
+- Mark-Copy
+그리고 G1GC는 Mark-Sweep 방식이 아닌 Mark-Copy 방식이다.
+Mark-Copy는 GC 대상 Region 은 해당 영역을 모두 청소 후 다른 Region 영역으로 옮긴다. 그러면 GC 대상의 Region 은 모두 비워지는 것이다. ( 삭제되거나 이동하거나 )
+하지만 늘 Region이 깨끗하게 비워지는 것은 아니다. 물론 Pause Time에 맞추기 위해 해당 Region에 절반만 처리하려고 계획하지도 않는다.
+# G1GC는 Region 단위를 유지하며, 처리할 Region 개수를 조절한다.
+
+Old Gen 영역에서는 살아있는 객체가 커서 복사하는 시간이 길어져 목표 시간을 넘길 것 같으면, GC를 전부 수행하지 않고 멈춘다.
+즉, 해당 과정으로 GC를 수행해도 Region이 청소되지 않고 남아있게 되는 것이다.
+# 정리하면 Old Gen 에서 정리가 잘 안되는 이유는 살아있는 객체가 너무 많아서 그렇다. 살아있는 객체를 다른 메모리로 옮기기엔 시간이 너무 많이 걸린다.
+
+하지만 Young Region 영역은 GC 후 메모리가 남아선 안된다. 그래서 목표 시간을 넘는다 하더라도 Young 영역은 반드시 처리해야 하는 부분이다. ( 결국 Pause 시간이 넘으면 Young 때문이다. )
+Eden 영역은 새로운 메모리를 할당하는 공간이다. 만약 해당 공간을 청소하지 않으면 새로운 객체를 생성할 수 없다.
+# 만약 Eden 영역에 처리 시간이 길게 걸리는 경우에는 Eden 영역을 줄인다.
+
+물론 Survivor0 / Survivor1 도 Young 영역이기 때문에 GC 대상의 Region은 목표 시간이 넘는다 하더라도 끝까지 수행한다.
+만약 Survivor 영역이 모자른 경우 Survivor Overflow 가 발생할 수 있다. G1GC는 이러한 대응이 구현되어 있다.
+
+- OLD 승격 조건
+G1GC에서 OLD 영역으로 승격하는 조건은 다음과 같다.
+
+1. Survivor 공간 부족 ( Promotion due to space pressure )
+살아남은 객체가 너무 많아 Survivor 영역으로 모두 옮기지 못할 경우 남은 객체는 모두 OLD 영역으로 간다.
+즉, Eden 영역에서 Survivor 영역으로 승격해야 하는데 Survivor 공간이 부족할 경우 바로 OLD 영역으로 간다.
+
+물론 Survivor 간에 복사 실패 시 OLD 영역으로 이동한다. ( 물론 공간이 부족하여 실패 했다면 )
+
+2. Tenuring 옵션을 통한 오래된 객체 이동
+-XX:MaxTenuringThreshold 옵션을 사용하면 Survivor 영역이 여유가 있음에도 Old 영역으로 승격시킨다.
+조건은 객체의 age >= Tenuring 이다. MaxTenuringThreshold 는 사용자가 정적으로 값을 줄 수 있지만 시스템이 동적으로 정한다.
+
+해당 옵션은 개발자가 AGE의 상한선을 정하는 것이다. 물론 JVM이 Survivor 공간이 모자르다면 해당 값을 낮출 것이다.
+# 해당 옵션의 기본 값은 15 이다.
+
+3. 거대 객체 ( Humongous )
+혹은 객체의 크기가 Region 크기의 절반 이상이면 Humongous 객체로 취급되어 바로 Old 영역으로 승격된다.
+
+4. Survivor 메모리 목표 초과 ( Dynamic Age 결정 )
+G1GC는 Survivor 영역을 꽉채우려고 하지 않고 여유 공간을 둔다.
+따라서 G1GC는 Survivor 영역이 부족하면 해당 객체의 age가 모두 차지 않아도 조기로 Old 영역으로 승격시킨다.
+조기 승격시킬 age 기준은 시스템이 동적으로 정한다.
+
+5. 복사 실패 ( Evacuation Failure )
+OLD 영역이 부족하여 객체를 복사할 수 없어 기존 위치에 남긴다.
+해당 부분은 승격이라기 보단 GC 실패 케이스이다.
+이 경우 Full GC가 발생한다.
+
+[ G1GC의 GC 발생 조건 ]
+
+1. Young GC (Evacuation Pause)
+새로운 객체가 생성되어 Eden 영역이 가득 찼을 때 발생한다.
+GC 대상은 Eden 영역과 Young 영역이다.
+
+2. Mixed GC
+OLD 영역 사용률이 InitiatingHeapOccupancyPercent 를 초과했을 경우 발생한다.
+-XX:InitiatingHeapOccupancyPercent=45 옵션을 기준으로 Heap 메모리의 45%가 찼을 경우 GC를 수행한다.
+GC 대상은 Young + Old 영역이다.
+# InitiatingHeapOccupancyPercent 의 기본 값은 45이다.
+# 이때 Old 영역은 일부만 GC하고, Garbage가 많은 영역을 골라 수행한다.
+
+3. Full GC
+복사 실패 ( Evaluation Failure ) 했을 경우 발생한다.
+이는 Old 영역으로 복사할 공간이 부족하거나 Old + Survivor 영역이 부족하여 복사에 실패 했을 경우 Full GC를 발생한다.
+
+그 외에 Heap 완전 포화, Promotion 실패, Humongous allocation 실패
