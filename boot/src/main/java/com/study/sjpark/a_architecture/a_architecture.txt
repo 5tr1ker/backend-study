@@ -82,33 +82,96 @@ application-prod.yml
 public DataSource devDataSource() { ... }
 
 - Auto configuration
-Spring Boot는 내부적으로 @Conditional 나 @EnableAutoConfiguration 가 등록되어 있다면,
-classpath 나 Bean 등록 여부를 확인하여 조건에 맞으면 빈을 등록해준다.
+Auto Configuration은 어플리케이션의 실행 환경 구성과 설정을 자동으로 해주는 기능이다.
+classPath에 존재하는 라이브러리와 설정 파일 ( yml ) , Bean 등록 여부를 기준으로 조건에 맞는 Bean을 자동으로 등록하는 기능이다.
+# classPath는 JVM이 클래스나 리소스를 찾는 경로의 집합이다.
 
-- Starter Dependency
-- Embedded Server
+이를 통해 DataSource, JPA , MVC 설정 등 어플리케이션 구동 시 필요한 설정을 자동으로 구성해주며,
+서버 구동 시 Embedded Tomcat과 DispatcherServlet 또한 자동으로 설정된다.
 
-[ Bean 생성 ]
-[ DI - Dependency Injection ]
-[ AOP - Aspect-oriented programming ]
-[ MVC 구조 - Model View Controller ]
+물론 개발자가 Bean 을 직접 등록하여 커스터마이징을 할 수 있도록 지원을 한다.
+즉, Spring Boot는 기본적인 설정을 자동으로 해주며, 개발자가 필요한 부분만 커스터마이징할 수 있다.
 
-[ Spring architecture ]
+[ Spring architecture / 요청 처리 흐름 ( Request Lifecycle ) ]
 
-Servlet Filter
+Spring 은 크게 Servlet Container 영역과 Spring Container 영역으로 나뉜다.
 
-DispatcherServlet
+1. Servlet Filter
+Servlet은 모든 요청을 필터링하며 Spring 과 무관한 Servlet 영역이다.
+사용자의 요청을 가장 먼저 처리하며, 보통 인증/인코딩 설정/로깅을 담당한다.
 
-HandlerMapping
+2. DispatcherServlet
+Spring MVC의 시작 입구이며, 모든 요청을 중앙에서 제어한다.
+요청을 어떤 Controller 에게 위임할 지 결정을 한다.
 
-HandlerAdapter
+3. HandlerMapping
+요청으로 넘어온 URL 을 어떤 컨트롤러에서 처리될 수 있는지 정보를 반환한다.
+구체적으로 요청된 URL 에 해당되는 Controller 객체를 찾아 DispatcherServlet 에게 반환한다.
 
-Interceptor ( PreHandler )
+ex ) @GetMapping("/users") 을 기준으로 탐색한다.
 
-Controller
+4. HandlerAdapter
+Controller 를 실행할 수 있게 연결해줄 수 있는 어댑터이다.
+이때 다양한 형태의 Controller 를 호출할 수 있게 유연성을 가지고 있다.
 
-Interceptor ( postHandler )
+왜냐하면 Controller 는 Annotation이나 HttpRequestHandler 등 다양한 형태를 가지고 있기 때문이다.
 
-View Resolver / Message Converter
+5. Interceptor ( PreHandler )
+Controller 가 실행되기 전에 호출된다.
+비즈니스 로직과 분리된 공통 로직을 처리한다. 예를 들면 권한 체크, 로그인 검사, 로깅 등을 수행할 수 있다.
 
-Response
+6. Controller
+개발자가 작성한 비즈니스 로직이 수행되는 공간이다. Service 나 Repository가 실행되어 DB에 적재하거나,
+사용자 요청에 맞는 데이터를 조회해서 결과를 반환한다.
+
+7. Interceptor ( postHandler )
+컨트롤러가 실행된 직후, 뷰 ( View ) 를 렌더링하기 전에 호출된다.
+컨트롤러가 반환한 데이터를 가공하거나 공통 작업을 처리할 수 있다.
+
+8. View Resolver / Message Converter
+View Resolver : 사용자에게 화면을 보여주어야 할 때, 어떤 JSP나 Thymeleaf 를 보여줄지 결정한다.
+Message Converter ( @RestController ) : 사용자에게 데이터를 직접 응답해야 할 때, JSON 이나 XML 으로 변환한다.
+
+9. Interceptor ( afterCompletion )
+모든 처리가 끝난 후에 호출된다.
+요청 처리 과정에서 사용된 리소스나 실행 시간 등을 기록하기 위해 활용된다.
+
+10. Response
+사용자에게 최종 결과를 반환한다.
+JSON 이나 HTML 등
+
+[ Servlet Container ]
+Servlet Container 영역은 대표적으로 Apache Tomcat 이 있으며,
+클라이언트의 HTTP 요청을 수신하고 이를 처리할 Servlet을 실행하며 생명주기를 관리한다.
+
+Tomcat은 웹 서버와 Servlet Container를 포함하고 있는 WAS 서버로
+Servlet Container는 어플리케이션 실행 시 or 최초 요청 시 Servlet 객체를 생성하고
+이후 요청이 들어오면 Servlet 객체를 활용하여 요청을 처리한다.
+# 즉, Servlet 객체는 싱글톤이며 여러 쓰레드가 공유하여 처리한다.
+
+또한 Servlet Container 는 Servlet의 생명 주기를 관리하며 ( init , service , destroy ),
+멀티 쓰레드 기반으로 동작한다.
+
+Servlet Container는 주로 웹 서버와 통신, 서블릿 관리, 필터를 담당하고 있다.
+1. 웹 서버와 통신 : Apache Tomcat 과 같은 WAS 는 HTTP 및 소켓 연결을 처리하고, 요청은 Servlet Container 로 전달하여 비즈니스 로직을 처리하게 한다. ( 실제 처리는 Servlet이 한다. )
+2. 서블릿 관리 : Servlet 인터페이스를 구현한 객체들을 생성하고 관리한다. 주로 HttpServlet 클래스를 기반으로 상속 및 확장되었다. ( 생명주기는 3단계로 나뉜다. - init , service , destroy )
+3. 필터 : 스프링에 진입하기 전 웹 단계에서 전처리를 수행한다.
+
+- 서블릿 ( Servlet )
+JAVA Servlet 스펙에 따라 만들어진 server-side 컴포넌트이다. HTTP 요청을 처리하는 자바 기반의 기술이다.
+여기서 DispatcherServlet는 Spring을 대표하는 Servlet을 말한다.
+
+여기서 서블릿을 실행해주는 서버는 톰캣이다.
+
+[ Spring Container ]
+Spring Container 영역은 스프링 빈의 생명주기를 관리하고, 객체 간의 의존성 주입을 담당한다.
+그리고 아래와 같은 특징이 있다.
+1. 비즈니스 로직 중심 : Controller, Service, Repository 등 실제 비즈니스 로직을 가지고 있는 객체를 관리한다.
+2. 유연성 : POJO ( Plain Old Java Object ) 기반의 객체 관리가 가능하다.
+3. Interceptor : 컨트롤러에게 요청이 전달되기 전과 후를 처리한다.
+
+[ Filter vs Interceptor ]
+Filter는 Servlet Container 영역에 위치하여, DispatcherServlet 에게 요청이 전달되기 전에 가장 먼저 처리한다.
+
+Interceptor는 Spring Container 내부에 위치하고 있으며 Controller가 호출되기 전과 후에 호출된다.
+인증과 권한, 로깅에 활용되며 컨트롤러에게 요청이 전달되기 전과 후에 요청과 응답에 대해 부가 작업을 처리한다.

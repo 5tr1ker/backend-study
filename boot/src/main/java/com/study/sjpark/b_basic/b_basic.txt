@@ -1,0 +1,4 @@
+[ Bean 생성 ]
+[ DI - Dependency Injection ]
+[ AOP - Aspect-oriented programming ]
+[ MVC 구조 - Model View Controller ]
