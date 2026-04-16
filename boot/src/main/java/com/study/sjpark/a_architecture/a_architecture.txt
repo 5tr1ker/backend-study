@@ -221,11 +221,55 @@ public class MyServlet extends HttpServlet {
 # 그렇기 때문에 Thread-Safe 하지 않으면 장애가 발생한다.
 
 [ Spring Container ]
-Spring Container 영역은 스프링 빈의 생명주기를 관리하고, 객체 간의 의존성 주입을 담당한다.
+Spring Container 영역은 스프링 빈을 생성하고 생명주기를 관리하며, 객체 간의 의존성 주입을 담당한다.
 그리고 아래와 같은 특징이 있다.
-1. 비즈니스 로직 중심 : Controller, Service, Repository 등 실제 비즈니스 로직을 가지고 있는 객체를 관리한다.
-2. 유연성 : POJO ( Plain Old Java Object ) 기반의 객체 관리가 가능하다.
-3. Interceptor : 컨트롤러에게 요청이 전달되기 전과 후를 처리한다.
+1. 객체 관리 : Controller, Service, Repository 등 어플리케이션에서 사용하고 있는 객체(Bean)들를 생성하고 관리한다.
+2. 의존성 주입 : 객체 간의 의존 관계를 자동으로 연결하여 결합도를 낮춘다.
+3. 생명주기 관리 : Bean의 생성, 초기화, 소멸까지 전체 생명주기를 관리한다.
+4. 유연성 : POJO ( Plain Old Java Object ) 기반으로 특정 기술에 종속되지 않는 객체를 사용할 수 있다.
+5. 인터셉터 : Controller에게 요청이 전달되기 전과 후에 부가 작업을 처리한다.
+
+- 의존성 주입 ( Dependency Injection )
+
+- 역전 제어 원칙 ( IoC , Inversion of Control )
+
+- 관점 지향 프로그래밍 ( AoP , Apsect-Oriented Programming )
+
+- Spring Container
+빈을 담고 있는 컨테이너
+
+- Bean 객체
+
+- Bean의 생명 주기
+
+- Bean Scope
+Singleton (기본)
+Prototype
+Request / Session
+
+- Bean 의 생성 과정
+Bean이 언제, 어떻게 만들어지는가?
+@ComponentScan
+@Bean
+@Configuration
+싱글톤 생성 과정
+초기화 (@PostConstruct)
+
+- Spring MVC
+
+- 트랜잭션 ( AoP 심화 )
+@Transactional
+프록시 기반 동작
+
+- POJO
+
+- 인터셉터 ( Interceptor )
+
+[ Spring Boot 의 자동 구성  ]
+어떤 흐름으로 실행이 되는가?
+@SpringBootApplication
+Auto Configuration
+내장 Apache Tomcat
 
 [ Filter vs Interceptor ]
 Filter는 Servlet Container 영역에 위치하여, DispatcherServlet 에게 요청이 전달되기 전에 가장 먼저 처리한다.
