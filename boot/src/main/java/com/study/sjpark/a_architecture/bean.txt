@@ -1,0 +1,77 @@
+- Bean 객체
+Bean은 Spring이 직접 생성하고 관리하는 객체로, 객체를 개발자가 생성하고 관리하는 것이 아니라 Spring이 대신 생성 및 관리한다.
+이렇게 생성된 객체 ( Bean ) 은 Spring Container ( IoC Container ) 안에 보관된다.
+
+클래스에 @Component 를 붙이게 되면, Spring 은 스캔하면서 이러한 클래스의 객체를 생성해서 Spring Container 에 등록을 한다.
+이렇게 Spring Container에 등록된 객체는 필요한 부분에 주입해준다. ( 의존성 주입 )
+뿐만 아니라 Bean의 생명주기인 생성, 초기화, 소멸을 관리한다.
+# 그리고 AoP도 Bean 기반으로 동작하며, Bean 객체를 Proxy 객체로 감싸서 등록된다.
+
+결론적으로는 Spring Container는 객체 생성 뿐만이 아니라 의존성 주입, 생명 주기 관리 등을 책임 진다.
+
+- Bean의 생명 주기 ( Lifecycle )
+
+1. Bean 생성 ( Instantitation )
+Spring은 객체를 생성해서 Spring Container 에 등록한다.
+이때 Spring 은 기본적으로 Bean을 싱글톤으로 생성하여 관리한다.
+# 싱글톤이란 어플리케이션 전체에서 단 하나만 존재하는 것을 말한다.
+
+2. 의존성 주입 ( DI )
+객체가 필요한 부분에 Spring Container 에 등록된 객체를 주입한다.
+
+3. 초기화
+Bean을 사용 가능한 상태로 설정한다.
+주로 DB 연결이나 설정 값, 캐시 로딩 등을 한다.
+초기화 하는 방법은 @PostConstruct , InitializingBean 구현 , @Bean(initMethod = "init") 방법이 있다.
+
+< 생성자 vs @PostConstuct 차이 >
+생성자는 DI 가 되기 이전에 호출이 되고, @PostConstruct 는 DI가 완료된 이후에 호출된다.
+그래서 생성자로 다른 Bean의 값을 가져올 경우 NullPointException이 발생할 수 있다.
+
+< Proxy 객체 생성 & 원본 Bean 교체 >
+해당 단계에서 AoP 적용 대상의 Bean 객체는 Proxy 객체로 교체된다.
+만약 처음 Bean 생성부터 Proxy 객체로 만들면 완성되지 않은 Bean 을 Proxy 객체로 감쌀 때 안정성에 문제가 발생하기 때문이다.
+# 미완성 객체는 초기화 또는 DI가 안되어있을 수 있다.
+
+그래서 AoP 적용 대상이더라도 처음엔 원본 객체를 생성한 후에 초기화 과정에서 Proxy 객체로 변경된다.
+이러한 작업을 AnnotationAwareAspectJAutoProxyCreator 가 담당한다.
+
+4. 사용
+어플리케이션에서 실제로 사용되는 단계이다.
+
+5. 소멸
+객체가 모두 사용된 후 Spring Container가 종료될 때 호출된다.
+이때 Spring Container가 종료되기 전에 호출된다.
+소멸자를 지정하는 방법은 @PreDestroy, DisposableBean, @Bean(destroyMethod = "close") 방법이 있다.
+
+- Bean Scope
+Bean Scope는 Bean의 생성 범위와 생명 주기를 정의하는 것이다. 즉, 요청마다 Bean을 만들지를 결정한다.
+
+1. Singleton
+Spring의 기본 값으로 컨테이너당 1개만 생성한다.
+모든 곳에서 동일한 Bean을 공유한다.
+AppleBean - A1
+BananaBean - A1
+CherryBean - A1
+
+그렇기 때문에 상태 값을 가지는 경우 모든 객체가 공유하기 때문에 주의해야 한다.
+
+2. Prototype
+@Scope("prototype") 를 통해 설정할 수 있으며, 요청마다 새로운 객체를 만든다.
+즉, 모든 곳은 서로 다른 Bean을 사용한다.
+AppleBean - A1
+BananaBean - A2
+CherryBean - A3
+
+Prototype 은 Spring 이 생성-초기화 까지만 관리하고, 종료는 하지 않는다는 특징이 있다.
+
+3. request
+웹 환경에서 사용할 수 있으며 HTTP 요청 1개당 1개이다.
+
+4. session
+웹 환경에서 사용할 수 있으며 세션당 1개를 가진다.
+주로 사용자별 상태 유지를 위해서 사용한다.
+
+5. application
+웹 환경에서 사용할 수 있으며, servletContext당 1개를 가진다.
+거의 singleton과 비슷하다.

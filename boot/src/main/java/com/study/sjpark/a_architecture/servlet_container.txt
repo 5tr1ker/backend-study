@@ -1,0 +1,63 @@
+[ Servlet Container ]
+Servlet Container 는 Servlet 을 실행하기 위한 환경이며, Servlet의 생명주기 관리와 요청 처리를 담당한다.
+이러한 Servlet Container 기능을 포함한 WAS는 대표적으로 Apache Tomcat가 있으며, 그 외에 Jetty와 Undertow 도 있다.
+Spring Boot는 기본적으로 Apache Tomcat을 내장 서버로 사용한다.
+
+Apache Tomcat는 클라이언트의 HTTP 요청을 수신하고 이를 처리할 Servlet을 실행하며 응답을 반환한다.
+
+Tomcat은 웹 서버와 Servlet Container를 포함하고 있는 WAS 서버로
+Servlet Container는 어플리케이션 실행 시 or 최초 요청 시 Servlet 객체를 생성하고, 요청이 들어오면 Servlet 객체를 재활용하여 요청을 처리한다.
+# 즉, Servlet 객체는 싱글톤이며 여러 쓰레드가 공유하여 처리한다.
+# 여기서 말하는 Servlet 의 구현체는 DispatcherServlet 이다.
+
+Servlet Container 를 포함하고 있는 Tomcat ( WAS ) 는 아래와 같은 역할을 담당한다.
+1. 웹 서버와 통신 : Tomcat은 Connector를 통해 HTTP 요청 및 소켓 연결을 처리하고, 수신받은 데이터인 네트워크 데이터를 자바 객체인
+HttpServletRequest 와 HttpServletResponse 으로 변환하여 Servlet Container 에 전달한다.
+2. 필터 : DispatcherServlet 에 진입하기 전/후 Servlet Container 영역에서 요청에 대한 부가 작업을 처리한다.
+3. 웹 어플리케이션 실행 : JSP나 Spring 기반 어플리케이션을 실행한다.
+4. 쓰레드 관리 : 한 요청당 하나의 쓰레드가 할당되며 병렬로 처리된다 ( 멀티 쓰레드 ) . 그리고 Tomcat은 이러한 쓰레드들은 Thread Pool 에서 관리된다.
+5. 요청/응답 객체 관리 : 요청 데이터를 HttpServletRequest 와 HttpServletResponse 객체로 생성하고 관리한다.
+6. 세션/보안 처리 : HTTP 세션을 생성 및 관리하며, 쿠키/세션 기반 인증에 대한 기본적인 보안 기능을 제공한다.
+
+그 외 Servlet Container는 DispatcherServlet 을 생성하고 생명주기를 관리한다. ( DispatcherServlet 등록은 Spring Boot 가 한다. )
+
+즉, 톰캣은 네트워크 처리부터 Servlet 실행, 쓰레드와 세션 관리까지 어플리케이션 실행에 필요한 전반적인 것들을 관리한다.
+
+- 서블릿 ( Servlet )
+JAVA Servlet 스펙에 따라 만들어진 서버 측 컴포넌트이다. HTTP 요청을 처리하는 자바 기반의 기술이다.
+이 Servlet 인터페이스를 구현한 클래스가 DispatcherServlet 이다.
+
+이러한 DispatcherServlet 은 웹 계층의 진입점이며, 요청 처리 흐름을 제어하는 역할을 한다.
+
+- JAVA Servlet 스펙
+JAVA Servlet 스펙은 웹 요청 처리를 위한 자바 표준 규칙을 말한다.
+Servlet 인터페이스는 init , service , destroy 의 생명 주기와 HTTP 요청 데이터를 HttpServletRequest / HttpServletResponse 객체로 처리하는 방법을 정의한다.
+
+이러한 스펙이 중요한 이유는 구현체를 바꿔도 코드가 그대로 동작하게 하기 위해서이다.
+ex ) Apache Tomcat , Jetty , Undertow
+
+- Servlet의 생명 주기
+Servlet Container 는 Servlet의 생명주기를 관리하는데, 여기서 생명주기는 총 3가지가 있다.
+init ( 초기화 ) : Servlet Container가 Servlet 객체를 생성하고 단 한번만 호출한다.
+service ( 요청 처리 ) : HTTP 요청이 들어올 때 마다 호출되며, 내부 비즈니스 로직을 수행한다. 이때 멀티쓰레드 환경으로 실행된다.
+destroy ( 종료 단계 ) : 서버 종료 혹은 Servlet 객체 제거 시 단 한 번 호출된다.
+
+여기서 init 과 destroy 단계에서는 Servlet Container 는 호출만 할 뿐 사실은 내부가 비어있다.
+그래서 개발자는 아래와 같이 Servlet의 구현체인 HttpServlet를 상속받아 init() 과 destroy() 를 구현할 수 있다.
+물론 이는 선택 사항이며, 필요시에 구현하면 된다.
+
+public class MyServlet extends HttpServlet {
+
+    @Override
+    public void init() {
+        // 기본적으로 비어 있음
+    }
+
+    @Override
+    public void destroy() {
+        // 기본적으로 비어 있음
+    }
+}
+
+# 이때 Servlet은 단 하나만 생성이되며 모든 쓰레드가 이 Servlet 객체를 공유하여 사용한다.
+# 그렇기 때문에 Thread-Safe 하지 않으면 장애가 발생한다.
