@@ -119,12 +119,53 @@ join fetch m.coupons
 따라서 연관관계 중에서 컬렉션이 많은 경우 하나만 fetch Join을 사용하고, 나머지는 BatchSize 를 사용하기도 한다.
 
 [ JPA를 사용하는 이유 - MyBatis와의 비교 ]
+JPA는 객체 중심 개발을 위해 사용되며, MyBatis는 SQL 중심 제어를 위해 사용된다.
 
-[ JPA Propagation 전파단계 ]
+구체적으로 말하면 JPA는 객체 지향적으로 DB를 다루기 위해 사용된다.
+이는 SQL를 직접 작성하지 않아도 메서드 호출만으로 내부에서 쿼리가 자동으로 실행된다.
+아래와 같이 Repository에 대해 save 메서드를 호출해서 엔티티를 인자로 넘겨주면, 내부에서 insert 쿼리가 자동으로 실행된다.
+memberRepository.save(member);
+
+또한 객체를 수정할 때에도 Update 쿼리가 자동으로 수행하는 "변경 감지" 기능 덕분에 개발자의 실수가 줄어들게 된다.
+member.setName("이름");
+
+또한 연관관계에 있어서 SQL JOIN 없이 객체를 타고 연관관계에 접근할 수 있다.
+member.getGroup().getCompany()
+
+뿐만 아니라 기본적인 CRUD를 제공하고 있어, 간단하고 반복적인 SQL 작성을 JPA 가 대신 해주어, 개발 생산성이 증가한다는 특징을 가지고 있다.
+이러한 이유 때문에 JPA를 사용하게 되는 것이다.
+
+그렇다면 이러한 JPA 장점을 포기하고 MyBatis를 사용하는 이유는 SQL을 직접 컨트롤할 수 있기 때문이다.
+이는 통계 쿼리나 대용량 집계 등 복잡한 쿼리를 직접 볼 수 있으며, SQL 쿼리가 눈으로 보이기 때문에 튜닝 포인트를 쉽게 찾을 수 있다.
+JPA는 SQL 직접 제어가 어렵고, 성능 튜닝에 한계가 있기 때문에 이러한 상황에서는 MyBatis 가 더 유리하다.
+
+실무에서는 JPA와 MyBatis를 같이 사용하는 경우가 있다. JPA는 간단한 CRUD나 도메인 로직에 활용되고, 대시보드나 통계와 같은 복잡한 쿼리는 MyBatis로 해결한다.
+
+[ JPA Propagation ( 전파 ) 전파단계 ]
+JPA를 사용하는 환경에서의 트랜잭션 전파 단계는 Spring 에서 제공하는 트랜잭션 관리 기능이다.
+JPA에서 사용하는 @Transactional 또한 Spring 에서 제공하는 어노테이션을 활용하는 것이다.
+
+Spring에서 트랜잭션이 커밋되는 시점에 flush가 발생하며, JPA의 EntityManager가 관리하는 영속성 컨텍스트의 변경 사항을 DB에 반영한다.
+# JPA를 사용하는 환경에서는 Spring @Transactional 에 EntityManager가 연결이 되어서 트랜잭션이 커밋되면 EntityManager가 flush를 통해 DB에 반영하게 된다.
+
+@Transactional 는 프록시를 기반으로 동작하기 때문에, 해당 프록시를 통해 메서드로 진입해야 트랜잭션이 시작된다.
+트랜잭션이 시작되면 영속성 컨텍스트가 생성되고, 그 안에서 변경 감지 및 flush가 되어야 DB에 반영된다.
+프록시가 필요한 이유는 트랜잭션을 시작하기 위해서이다.
+
+- Spring 트랜잭션 전파 단계
+서비스 계층에서 이미 트랜잭션이 있을 때 새로운 트랜잭션을 어떻게 처리할 것 인지를 정하는 것이다.
+기본 값인 REQUIRED 부터 시작하여 , REQUIRES_NEW , SUPPORTS , NOT_SUPPORTED , MANDATORY , NEVER 등.. 이 있으며 아래의 코드처럼 전파 단계를 설정할 수 있다.
+@Transactional(propagation = Propagation.REQUIRED)
 
 [ LAZY 지연 로딩의 프록시 객체 ]
+프록시 객체는 실제 엔티티 대신에 사용되는 가짜 객체이다.
+이는 당장 필요하지 않는 데이터는 조회하지 않고, 실제 사용 시점에 조회를 지연시키기 위해 활용된다.
+LAZY 지연 로딩에서 연관 엔티티는 DB에서 바로 조회하지 않고 프록시 객체를 반환했다가, 이후 프록시 객체의 실제 데이터를 접근하는 시점에 DB에서 조회하여 프록시 객체를 초기화 시킨다.
 
-[ 연관관계 주인 선정 방법 ]
-mappedBy 쪽에서 fetch join을 걸면 추가 쿼리가 더 발생할 수 있다.
+프록시 객체가 초기화되기 위해서 영속성 컨텍스트가 필요하며, 일반적인 Spring 환경에서는 트랜잭션 범위 내에서 영속성 컨텍스트가 유지된다.
+만약 영속성 컨텍스트 밖에서 프록시 객체를 초기화할 경우 LazyInitializationException 가 발생한다.
 
-[ Spring @Transactional 과 JPA @Transaction 차이 ]
+Member m = em.find(~);
+Order o = m.getOrder();
+# Order 가 지연 로딩일 때 해당 시점에는 프록시 객체가 반환되었다가 프록시 객체의 내부 값을 조회할 때 초기화되어 실제 엔티티 데이터를 로딩한다.
+int key = o.getName(); // 값을 사용할 때 DB에서 조회된다.
