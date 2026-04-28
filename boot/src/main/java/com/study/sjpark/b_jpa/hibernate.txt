@@ -1,0 +1,45 @@
+[ JPA와 Hibernate의 관계 ]
+JPA는 Java Persistence API 의 약자로 자바에서 DB를 객체처럼 다루기 위한 표준 명세이다.
+이는 @Id, @Entity , EntityManager , 영속성 컨텍스트 등을 정의를 한다.
+
+Hibernate ORM은 JPA 명세를 실제로 구현한 ORM 프레임워크로 JPA가 정의한 표준을 실제로 동작하게 구현하였다.
+즉, SQL 을 생성하고 DB 와 통신하고 변경 감지를 처리하는 실제 구현체이다.
+
+JAVA로 비유하면 인터페이스와 그 구현체가 될것이다.
+우리가 코드로 JPA를 사용하는 것 처럼 보이지만, 실제로는 내부에서 Hibernate가 처리하고 있는 것이다.
+
+그렇다면 구현체인 Hibernate 를 직접사용하지 않고 JPA를 사용하는데는 아래와 같은 이유가 있다.
+1. 구현체 교체 가능 - 기본적으로 Hibernate 구현체를 사용하지만, 다른 구현체인 eclipseLink로 바뀔 경우 코드를 변경하지 않기 위해서이다.
+2. Spring이 JPA를 기반으로 설계 - Spring은 JPA를 기반으로 설계되었기 때문에 구현체를 직접 사용할 경우 오작동을 할 수 있다.
+
+우리가 JPA를 공부하고있는 것은 Hibernate를 공부하는 것과 같다. 예를 들어 N + 1 , 성능 이슈 , fetch 전략은 Hibernate가 제공하고 있는 기능이다.
+대부분의 프로젝트에서는 Hibernate를 사용하고 있다.
+
+[ JPA의 구현체들과 Hibernate를 주로 사용하는 이유 ]
+JPA의 구현체는 아래와 같이 여러가지가 있다.
+
+Hibernate ORM ( 가장 많이 쓰며 Spring Boot에서는 기본 값으로 사용된다. ) ,
+EclipseLink ( JPA 공식 레퍼런스 구현체이지만 실무에서는 거의 사용하지 않는다. )
+Apache OpenJPA
+
+- Hibernate ORM 를 주로 사용하는 이유
+1. Spring Boot의 기본 설정 값
+Spring Boot에서 JPA를 사용할 경우 자동으로 Hibernate와 연결을 한다. 이를 통해 별도의 설정 없이 JPA 를 쉽게 사용할 수 있다.
+
+2. 기능이 많음
+Hibernate ORM은 JPA의 표준 명세를 넘어 추가로 더 많은 기능을 제공한다.
+다양한 캐시 전략 및 batch 처리, 통계 및 모니터링 기능을 제공하여 실무에서 필요한 기능을 추가로 제공하고 있다.
+
+3. 레퍼런스가 많음
+인터넷에 있는 JPA 문제에 대한 해결책은 대부분 Hibernate 기준으로 작성되어 있다.
+그렇기 때문에 문제가 발생할 경우 빠르게 해결할 수 있다.
+
+4. 커뮤니티 활성화 및 높은 안정성
+Hibernate ORM은 오래되었고, 사용자도 많다.
+그렇기 때문에 다양한 대규모 서비스에서 검증이 되어 있으며, 버그에 대해 빠른 대응이 가능하다.
+
+5. Spring Data JPA와 궁합이 좋다.
+Spring Data JPA는 Hibernate를 기준으로 최적화가 되었다.
+그렇기 때문에 다른 구현체를 사용할 경우 예상치 못한 결과를 얻을 수 있다.
+
+이러한 장점을 보면 Hibernate를 사용하지 않을 이유가 없다.
