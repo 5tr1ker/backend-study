@@ -1,0 +1,86 @@
+[ EventLoop 에서의 Blocking ]
+
+- 블로킹 로직을 워커 쓰레드가 아닌 이벤트 루프 쓰레드를 늘리는 방법?
+
+[ EventLoop에서 병목이 발생한 것을 어떻게 알 수 있을까? ]
+가장 간단한 방법으로는 쓰레드 덤프를 뜨는 것이다. 아래의 명령어를 통해서 쓰레드의 상태를 txt로 남길 수 있다. ( 윈도우 기준 )
+jstack PID > thread.txt
+
+쓰레드 덤프 내에서 이벤트 루프와 워커 쓰레드는 다음과 같은 이름을 가지고 있다.
+reactor-http-nio-N ( 이벤트 루프의 이름이며 N 자리에는 쓰레드의 번호가 부여된다. CPU 코어가 4라면 8개의 이벤트 루프를 볼 것이다. )
+boundedElastic-N ( 워커 쓰레드의 이름이며 N 자리에는 워커 쓰레드의 번호가 부여된다. )
+# 기본적으로 이벤트 루프는 CPU 코어 x 2 개가 기본 값이다.
+# 워커 쓰레드는 기본 CPU 코어 x 10 개가 기본 값이다.
+
+- EventLoop의 병목 발생 시
+만약 이벤트 루프에서 블로킹으로 인한 병목이 발생을 했을 경우 쓰레드 덤프에는 아래와 같은 로그가 남게 된다.
+"reactor-http-nio-2" #43 ... 생략
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleepNanos0(java.base@24.0.2/Native Method)
+	at java.lang.Thread.sleepNanos(java.base@24.0.2/Thread.java:482)
+	at java.lang.Thread.sleep(java.base@24.0.2/Thread.java:513)
+... 생략
+
+실제로 모든 이벤트 루프의 쓰레드가 위와 같은 상태를 가지고 있을 것이다.
+위의 로그에는 Thread.sleep() 으로 인한 블로킹으로 쓰레드가 멈춰 있는 상태 ( TIMED_WAITING (sleeping) ) 를 나타내고 있다.
+즉, 모든 이벤트 루프가 블로킹이 되어 더이상 작업을 하고 있지 않은 상태이다.
+실제로 테스트 시 Thread.sleep() 메서드를 활용해서 1.5초간 병목을 주었다.
+
+쓰레드 덤프에는 위와 같이 어떤 메서드로 인한 블로킹이 발생했는지 나타내기 때문에 문제가 되는 로직을 어렵지 않게 개선할 수 있을 것이다.
+
+- EventLoop 정상 상태 ( 워커 쓰레드 병목 )
+반대로 EventLoop가 아닌 워커 쓰레드에게 블로킹 로직을 주었을 때 쓰레드 덤프는 아래와 같은 로그를 남기게 된다.
+"reactor-http-nio-5" ... 생략
+   java.lang.Thread.State: RUNNABLE
+	at sun.nio.ch.WEPoll.wait(java.base@24.0.2/Native Method)
+	at sun.nio.ch.WEPollSelectorImpl.doSelect(java.base@24.0.2/WEPollSelectorImpl.java:108)
+... 생략
+
+위의 상태 값은 I/O 이벤트를 기다리고 있는 상태로 실제로 일을 하지 않고 있는 상태이다.
+신기하게 병목을 주고 있는 상태에서 8개의 모든 이벤트 루프는 위의 상태 값을 가지고 있었다.
+그 이유는 병목 로직을 워커 쓰레드에게 위임하고 있었기 때문이다.
+
+실제로 병목 상태에서 다수의 워커 쓰레드가 블로킹 상태였는데, 대부분의 워커 쓰레드가 아래와 같은 로그를 출력했다.
+"boundedElastic-87" #138 [20456] ...생략
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+	at java.lang.Thread.sleepNanos0(java.base@24.0.2/Native Method)
+	at java.lang.Thread.sleepNanos(java.base@24.0.2/Thread.java:482)
+	at java.lang.Thread.sleep(java.base@24.0.2/Thread.java:513)
+... 생략
+로그를 보면 Thread.sleep() 블로킹 로직이 워커 쓰레드에서 진행되고 있었다.
+EventLoop에서 병목이 발생하던 상황과는 다르게 워커 쓰레드에서 블로킹 로직이 실행되고 있었다.
+
+[ 병목 테스트 ]
+병목 테스트 시 주의 사항으로는 이벤트 루프 갯수 이상의 동시성으로 부하를 주어야 한다.
+예를 들어 이벤트 루프의 쓰레드가 8개일 때, 동시성을 8 이하로 줄 경우 병목을 제데로 재현하지 못할 수 있다.
+쉽게 말해 EventLoop에서 병목을 주든, 워커 쓰레드에서 병목을 주든 차이가 없을 것이란 것이다.
+
+- 테스트 조건
+테스트에 사용된 API는 요청 시 1.5초의 지연 후 응답하는 간단한 API이다.
+이벤트 루프와 워커 쓰레드의 갯수는 다음과 같다. ( 이벤트 루프 : 8 / 워커 쓰레드 : 50 )
+
+- 테스트 결과
+
+1. 부하 시간 : 15s / 동시성 : 50
+이벤트 루프 병목 : TPS 8.13 , 평균 MTT : 7812ms , 총 요청 수 : 122회
+워커 쓰레드 병목 : TPS 33.3 , 평균 MTT : 1511ms , 총 요청 수 : 500회
+
+2. 부하 시간 : 30s / 동시성 : 50
+이벤트 루프 병목 : TPS 6.73 , 평균 MTT : 8458ms , 총 요청 수 : 202회
+워커 쓰레드 병목 : TPS 33.3 , 평균 MTT : 1508ms , 총 요청 수 : 1000회
+
+3. 부하 시간 : 15s / 동시성 : 100
+이벤트 루프 병목 : TPS 11.4 , 평균 MTT : 13819ms , 총 요청 수 : 172회
+워커 쓰레드 병목 : TPS 54.5 , 평균 MTT : 1889ms , 총 요청 수 : 818회
+
+4. 부하 시간 : 30s / 동시성 : 100
+이벤트 루프 병목 : TPS 8.3 , 평균 MTT : 15645ms , 총 요청 수 : 250회
+워커 쓰레드 병목 : TPS 54.0 , 평균 MTT : 1882ms , 총 요청 수 : 1620회
+
+5. 부하 시간 : 15s / 동시성 : 5
+이벤트 루프 병목 : TPS 3.33 , 평균 MTT : 1507ms , 총 요청 수 : 50회
+워커 쓰레드 병목 : TPS 3.33 , 평균 MTT : 1507ms , 총 요청 수 : 50회
+
+6. 부하 시간 : 30s / 동시성 : 5
+이벤트 루프 병목 : TPS 3.33 , 평균 MTT : 1509ms , 총 요청 수 : 100회
+워커 쓰레드 병목 : TPS 3.33 , 평균 MTT : 1508ms , 총 요청 수 : 100회
