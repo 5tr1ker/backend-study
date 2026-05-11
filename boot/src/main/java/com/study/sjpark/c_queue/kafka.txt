@@ -1,0 +1,95 @@
+[ Kafka 의 구성요소 ]
+Kafka는 분산 로그 기반 메세징 시스템으로, 고성능이며 확장성이 좋다는 특징을 가지고 있다.
+Kafka의 전체 구조로는 Producer -> Topic -> Partition -> Broker -> Consumer 로 구성되어 있다.
+
+1. Producer ( 생산자 )
+데이터를 Kafka로 보내는 주체로 API 서버나 로그 수집기가 될 수 있다.
+Producer는 메세지를 특정 Topic 으로 전달하고, 어떤 Partition에 넣을지를 결정한다.
+이때 Partition에 넣을 때는 특정 Key를 기반으로 넣을 수 있고, Round Robin 으로 넣을 수 있다.
+
+2. Topic ( 논리적 채널 )
+메세지를 논리적으로 분류하는 단위이며 실제 저장은 Topic 안에 Partition 에 저장된다.
+그렇기 때문에 Topic은 최소 1개 이상의 Partition을 가져아 한다.
+
+3. Partition ( 파티션 )
+Partition은 독립적인 로그 파일이며 Topic을 쪼개놓은 단위이다. ( Partition은 1개의 Topic과 매핑되어 있다. )
+같은 Partition 에 저장된 메세지는 순서가 보장이 되며 Consumer는 Offset을 기반으로 메세지를 읽는다. ( index 와 유사 )
+한 Topic에 여러 Partition을 구성하여 분산 저장을 통해 병렬 처리를 할 수 있다.
+
+- Partition의 분산 방식
+1. Round Robin ( 기본 값 )
+Key를 사용하지 않은 경우 기본 값이 되며 각각의 Partition 에게 균등 분배된다.
+그렇기 때문에 전체 작업을 기준으로 순서가 보장되지 않는다.
+
+2. Key 기반 분류
+같은 Key는 같은 Partition에 할당된다.
+이를 활용하여 특정 기준으로 순서를 보장할 수 있으며, 해당 방법을 가장 많이 활용한다.
+
+3. Custom Partition 전략
+직접 로직을 구현하여 특정 조건별로 Partition을 할당할 수 있다.
+
+위와 같이 여러 Partition을 배치하면 병렬 처리를 하면 성능이 향상되고 확장성이 용이하지만,
+순서가 보장되지 않을 수 있다는 단점이 존재한다.
+다만 같은 Key를 활용하면 어느정도 순서는 보장할 수 있기 때문에 시스템 구조에 따라 유연하게 결정하면 된다.
+# Partition의 갯수는 Consumer의 갯수, TPS , 순서 보장 필요 여부에 따라 결정하면 된다.
+# 또한 순서가 중요할 경우 Partition을 1개만 쓰거나 같은 Key를 활용하고, 성능이 중요한 경우 여러 Partition 을 배치하여 병렬 처리로 배치하면 된다.
+
+- Partition의 저장 방식
+1개의 Partition 당 여러 개의 로그 파일로 나누어 저장한다.
+즉, 한개의 큰 파일이 아닌 작은 파일 단위인 세그먼트로 나누어 관리한다.
+파일 저장 시 .log ( 실제 메세지 데이터 ) , .index ( offset 위치 매핑 ) , .timeindex ( timestamp 기반 조회 ) 로 나누어 저장한다.
+또한 위의 Segment는 일정 시간이 지나거나 일정 크기가 넘어서면 새 파일에 저장한다. 그래서 1개의 Partition 에는 N * 3 개의 Segment 파일이 생성된다.
+
+이렇게 파일을 쪼개는 데에는 성능과 크게 연관이 있다.
+쓰기 최적화 : Kafka는 append-only 로 파일의 뒤에서만 쓰는 Sequential I/O 방식이기 때문에 매우 빠르다.
+관리 최적화 : Kafka는 TTL / retention 기반으로 오래된 Segment를 통째로 삭제한다.
+장애 최소화 : 파일이 깨질 경우 전체 장애 영향을 최소화한다.
+
+4. Broker ( 서버 )
+Kafka 서버 1대당 Broker 서버 1대가 할당이되며, 메세지를 저장하고 Producer/Consumer 요청을 처리한다.
+
+여러 Broker가 모이면 Cluster가 구성이 되고, 이때 Partition은 Broker에 분산 저장하게 된다.
+
+- Cluster
+Cluster는 여러 Broker의 묶음으로 확장성 ( Scale-Out ) 과 장애 대응을 위해 구성한다.
+
+- Replication ( 복제 )
+Partition은 여러 Broker 에 복제되며, Leader 와 Follower 로 구성이 된다.
+평소에는 Producer/Consumer 는 Leader 와 통신을 하다가 Leader에 장애가 발생하면 Follower를 Leader로 승격시키고
+승격된 Follower 와 통신을 한다.
+
+물론 Follower 는 Leader 를 복제하여 같은 상태 값을 가진다.
+
+5. Consumer ( 소비자 )
+메세지를 읽는 주체로 Pull을 통해 메세지를 가져온다.
+이때 Offset을 기반으로 데이터를 읽으며, 어디까지 읽었는지 기록을 한다.
+
+- Offset
+메세지의 위치 ( index ) 를 말하며, Consumer가 직접 관리한다.
+필요에 따라 offset 값을 되돌려서 재처리를 할 수 있다.
+
+6. Consumer Group
+Consumer 들을 묶는 그룹이다.
+같은 그룹일 경우 Partition을 나눠서 처리하고, 다른 그룹일 경우 같은 메세지를 독립적으로 소비한다.
+병렬 처리 및 확장성, 중복 소비를 방지하기 위해 활용된다.
+
+7. Zookeeper
+Kafka의 메타데이터를 관리한다.
+크게 Leader를 선출하고 Broker의 상태를 관리한다.
+
+
+[ Kafka의 특징 ]
+1. 디스크 기반 고성능 조회
+Kafka는 디스크 로드를 통해 데이터를 읽지만 Random I/O 가 아닌 Sequential I/O 방식으로 데이터를 조회하여 속도가 빠르다.
+
+2. 부분적 순서 보장
+같은 Partition 내부에서만 순서를 보장한다.
+
+3. 높은 확장성
+Partition을 늘리면 처리량이 증가한다.
+
+4. 다양한 장애 대응
+Replication ( 복제 ) 이나 Leader Election 방식을 통해 장애를 극복할 수 있다.
+
+5. Pull 기반
+Consumer는 속도를 조절할 수 있다.
