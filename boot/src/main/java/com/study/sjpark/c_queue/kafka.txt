@@ -107,6 +107,7 @@ ack 설정 : acks=0 ( Producer가 메세지를 보내고 종료 ) , acks=1 ( Lea
 replication factor ≥ 3
 acks = all
 min.insync.replicas ≥ 2
+# min.insync.replicas 는 최소 복제 갯수로 replication 중 N개 이상이 복제되지 않을 경우 실패 처리한다.
 
 - 장애 대응 (Fault Tolerance)
 Controller Broker는 Leader의 상태를 감시하고 있다가 Leader에서 장애가 발생하면 ISR 중에서 하나를 Leader로 승격시킨다.
@@ -211,6 +212,35 @@ Controller Broker가 죽으면 즉시 감지하여 자동으로 새로운 Contro
 이후 해당 Controller 가 전체 Cluster 메타데이터 관리를 이어 받는다.
 
 # Broker가 죽어서 Partition Leader 와 함께 기능이 정지될 경우 ISR 에서 새로운 Leader를 호출하는 것은 Controller Broker가 수행한다.
+
+[ Replica 레플리카 ]
+Replica는 Partition을 여러 Broker에 복제하여, 고가용성의 구조로 만드는 개념이다.
+# 고가용성이란 시스템에 장애가 발생하여도 서비스 중단 없이 지속적으로 운영되는 구조를 말한다.
+Kafka는 Partition 단위로 저장된 데이터를 여러 Broker에 복제해 둔다.
+ex )
+Broker1 - Partition 1 ( Leader )
+Broker2 - Partition 1 ( Follower )
+Broker3 - Partition 1 ( Follower )
+이를 통해 Broker1 이 죽어도 Broker2 혹은 Broker3 이 대신 처리하여 서비스 중단 없이 지속되는 고가용성의 특징을 가진다.
+
+- Leader / Follower 구조
+레플리카는 Partition 복제뿐만 아니라, Leader Replica 와 Follower Replica 도 존재한다.
+
+Leader Replica는 데이터 읽기 및 쓰기를 진행하고 Producer/Consumer와 통신을 한다.
+그리고 Follower Replica는 평소에 Leader 데이터를 복제만 진행하고, Leader가 죽었을 경우 Follower 중 하나가 Leader로 승격한다.
+이때 Leader 승격은 ISR 내부에서만 발생하며, ISR 내부에서는 Leader와 동기화가 잘 된 Follower Replica 들이 존재한다.
+
+# ISR은 In-Sync Replica 의 약자이다.
+# 동기화가 안된 Follower Replica 는 제외된다.
+
+- replication factor
+Kafka는 전체 Replica 갯수를 설정할 수 있다.
+값이 높을 수록 안정성이 높아지지만, 저장 공간 비용과 네트워크 비용또한 증가한다는 단점을 가지고 있다.
+Leader의 개수는 1개 고정이며, 나머지는 모두 Follower 로 배정된다.
+예를 들어 replication factor 의 값이 3일 경우 1개의 Leader와 2개의 Follower 를 가지게 된다.
+
+replication factor가 1인 경우 Follower Replica는 없으며, 장애가 발생하면 복구가 불가능하다.
+일반적으로 3을 가장 많이 쓴다.
 
 [ Kafka의 특징 ]
 1. 디스크 기반 고성능 조회
