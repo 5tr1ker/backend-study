@@ -255,5 +255,10 @@ Partition을 늘리면 처리량이 증가한다.
 4. 다양한 장애 대응
 Replication ( 복제 ) 이나 Leader Election 방식을 통해 장애를 극복할 수 있다.
 
-5. Pull 기반
-Consumer는 속도를 조절할 수 있다.
+5. Offset 기반 Pull 모델
+Kafka에서 Pull 모델은 Consumer가 Offset을 기준으로 Broker에게 데이터를 요청하여 처리 속도를 직접 조절할 수 있다.
+이는 데이터를 밀어주는게 아니라 Consumer가 직접 Broker에게 요청하여 데이터를 가져온다.
+기존 Push 방식의 문제점인 Consumer의 속도에 맞추지 않고 계속 요청을 전달하여 서버에 부하가 발생되는 Backpressure 의 문제가 해결된다.
+
+그리고 Consumer 는 Offset을 통해 어디까지 데이터를 읽었고 어디서부터 데이터를 읽을 지 결정할 수 있다.
+이를 통해 재처리를 할 수 있고, 장애 복구를 할 수 있다.

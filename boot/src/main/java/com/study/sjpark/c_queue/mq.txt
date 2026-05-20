@@ -1,0 +1,89 @@
+[ 전통 MQ 란? ]
+전통 MQ ( Message Queue ) 는 작업 처리용 큐이다.
+전통 MQ에는 대표적으로 RabbitMQ 와 ActiveMQ , ArtemisMQ 등이 있으며, RabbitMQ 를 그중에서 가장 많이 사용한다.
+
+[ 전통 MQ의 구성 요소 - RabbitMQ 기준 ]
+Broker
+Producer → Exchange → Queue → Consumer
+
+- Producer ( 생산자 )
+메세지를 생성해서 MQ로 보내는 주체이다.
+
+- Consumer ( 소비자 )
+큐에서 메세지를 가져가는 주체이며, 처리 완료 시 ACK 신호를 보낸다.
+여러개의 Consumer 를 연결하여 병렬 처리를 할 수 있다.
+다만, 같은 Queue에 여러 개의 Consumer가 연결된 경우에는 하나의 메세지는 1개의 Consumer만 갖는 경쟁 구조가 된다.
+즉, 여러 개의 Consumer 가 한 큐에 붙어있다 하더라도, 하나의 메세지는 한 Consumer 만 처리한다.
+
+- Broker ( MQ 서버 )
+메세지를 저장, 전달, 관리하는 핵심 시스템이다.
+대표적으로 메세지를 저장하고, 라우팅을 하며, Consumer에게 메세지를 전달하는 역할을 한다.
+Broker는 메세지에 대해 상태 관리를 하며, Consumer에게 처리가 완료되었다는 신호인 ACK 신호를 받으면 해당 메세지를 삭제하고,
+실패 신호인 NACK 신호를 받으면 재처리하거나 DLQ에 보낸다.
+
+- Queue ( 큐 )
+실제 메세지가 쌓이는 공간으로 작업 대기열이다.
+FIFO 의 구조를 가지고 있으며, Consumer가 메세지를 가져갈 때 까지 대기한다.
+Queue는 작업 종류별로 다수의 큐를 배치할 수 있지만, 순서 보장은 동일한 Queue일 경우에만 순서를 보장한다.
+
+- Exchange ( 라우터 )
+Producer가 보낸 메세지를 어떤 Queue로 보낼지 결정한다.
+direct , topic , fanout 이 있다.
+
+또한 Binding 규칙을 통해 특정 조건일 경우 특정 큐로 보내는 규칙을 만들 수 있다.
+Binding 은 Exchange 와 Queue 를 연결한다.
+
+- Message ( 메세지 )
+실제 전달되는 데이터로 Body와 Header , Routing Key 로 구성이 되어 있다.
+
+- ACK / NACK
+메세지의 처리 결과이며 Consumer가 Broker에게 알려준다.
+ACK는 처리 완료의 신호로 Broker는 해당 메세지를 삭제한다.
+NACK는 처리 실패의 신호로 재전송을 하거나 DLQ 로 보낸다.
+
+[ Queue 패턴 ]
+
+- Work Queue
+1개의 Queue에 N개의 Consumer가 붙는 구조이다.
+작업 분산 처리를 위해 구성한다.
+
+- Routing 조건별 분기
+Exchange -> QueueA 혹은 QueueB
+Binding 규칙을 통해 메세지의 규칙에 따라 특정 Queue에 메세지를 전달한다.
+
+- Pub/Sub ( Fanout )
+Producer -> 여러개의 Queue
+Producer는 여러 개의 Queue에 같은 메세지를 발행할 수 있으며, 이를 통해 여러 Consumer 가 동일 메세지를 처리하게 할 수 있다.
+
+[ 메세지 분배 방법 ]
+하나의 큐에 대해 다수의 Consumer가 연결되어 있는 경우 하나의 메세지에 대해 하나의 Consumer만 처리하게 된다.
+이때 메세지를 분배하기 위한 방법으로는 Round-Robin 방법과 Prefetch 방법이 있다.
+
+- Round-Robin
+여러 Consumer 들을 돌아가면서 순서대로 1개씩 분배한다.
+
+- Prefetch
+속도 기반 분배로 빨리 처리되는 Consumer에게 더 많은 메세지가 할당된다.
+
+- Broadcast ( Fan-Out )
+
+[ 전통 MQ 특징 ]
+- Push 기반 모델
+Broker가 Consumer에게 메세지를 밀어 넣는다.
+메세지가 빠르게 전달되지만, Consumer에 부하가 발생할 수 있다.
+
+- 메세지 소비 후 삭제
+Consumer가 소비된 메세지는 삭제된다.
+그렇기 때문에 한번 소비된 메세지는 재처리될 수 없다.
+
+# Kafka는 메세지를 로그에 저장해두고 일정 기간 유지한다. ( Retention )
+
+- 상태 기반
+메세지가 처리됐는지에 대한 상태를 관리한다.
+상태는 ACK, NACK , 재전송 등이 있다.
+
+- 메세지 순서 보장
+단일 Queue 기준으로 순서를 보장한다.
+
+- 확장성 제한
+전통 MQ는 Broker 중심 구조이기 때문에 수평 확장이 어렵다.
