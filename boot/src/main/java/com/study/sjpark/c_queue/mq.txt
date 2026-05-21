@@ -11,7 +11,7 @@ Producer → Exchange → Queue → Consumer
 
 - Consumer ( 소비자 )
 큐에서 메세지를 가져가는 주체이며, 처리 완료 시 ACK 신호를 보낸다.
-여러개의 Consumer 를 연결하여 병렬 처리를 할 수 있다.
+여러 개의 Consumer 를 연결하여 병렬 처리를 할 수 있다.
 다만, 같은 Queue에 여러 개의 Consumer가 연결된 경우에는 하나의 메세지는 1개의 Consumer만 갖는 경쟁 구조가 된다.
 즉, 여러 개의 Consumer 가 한 큐에 붙어있다 하더라도, 하나의 메세지는 한 Consumer 만 처리한다.
 
@@ -21,10 +21,32 @@ Producer → Exchange → Queue → Consumer
 Broker는 메세지에 대해 상태 관리를 하며, Consumer에게 처리가 완료되었다는 신호인 ACK 신호를 받으면 해당 메세지를 삭제하고,
 실패 신호인 NACK 신호를 받으면 재처리하거나 DLQ에 보낸다.
 
+메세지가 가질 수 있는 상태는 다음과 같다.
+1. Ready : 아무도 가져가지 않은 상태
+2. In_Flight : Consumer에게 메세지가 전달됐지만 ACK 신호를 받지 못한 상태 ( 이때 어떤 Consumer 가 처리중인지 기록 )
+    ㄴ 이때 Consumer 가 ACK 신호를 보내지 못하고 죽을 경우 다시 Ready 상태로 갈 수 있다. 이때 메세지가 중복 전달되는 At-Least-Once 가 발생한다.
+3. Acked : Consumer에게 ACK 신호를 받은 상태
+4. Expired : TTL 이 지난 메세지
+    ㄴ TTL 은 Producer가 정할 수 있으며, 요청된 메세지가 TTL 기간동안 처리되지 못할 경우 삭제되거나 DLQ로 이동된다. ( 기본 값은 삭제 )
+
+Broker는 ACK 신호를 받으면 해당 메세지를 Queue에서 제거하고, 디스크 제거 대상에 등록한다.
+메세지는 ACK 신호를 받은 뒤에 삭제되지만 내부적으로는 삭제 표시만 남겨두고 나중에 한번에 삭제할 수 있다.
+
+Broker는 Consumer에게 메세지를 Push 기반으로 전송하는데, Consumer가 연결될 경우 메세지를 하나씩 건네준다.
+이후 Consumer가 ACK 신호를 주면 다음 메세지를 전송한다. 이때 메세지는 1개씩 전송한다.
+# 1개씩 전송하면 속도가 느리기 때문에 N개의 메세지를 한번에 보낼 수 있는 Prefetch 방식이 있다. 다만 ACK 관리가 복잡해진다.
+
 - Queue ( 큐 )
 실제 메세지가 쌓이는 공간으로 작업 대기열이다.
 FIFO 의 구조를 가지고 있으며, Consumer가 메세지를 가져갈 때 까지 대기한다.
 Queue는 작업 종류별로 다수의 큐를 배치할 수 있지만, 순서 보장은 동일한 Queue일 경우에만 순서를 보장한다.
+
+Queue는 Broker에 의해 관리되고 있으며, Queue에 들어간 데이터는 메모리나 디스크에 보관한다. ( 둘다 저장할 수 있다. )
+메모리를 사용할 경우 데이터 저장 속도가 빠르지만 Broker가 죽을 경우 메세지가 유실된다는 단점이 가지고 있다.
+그래서 로그나 임시 작업 같은 작업에 사용한다.
+
+디스크를 사용하는 경우 장애가 발생해도 복구할 수 있는 특징을 가지고 있으며, 대부분 환경에서는 디스크에 데이터를 저장한다.
+이때 디스크에 데이터를 먼저 저장하고 Queue에 등록한 다음 Consumer에게 전달한다.
 
 - Exchange ( 라우터 )
 Producer가 보낸 메세지를 어떤 Queue로 보낼지 결정한다.
@@ -40,6 +62,23 @@ Binding 은 Exchange 와 Queue 를 연결한다.
 메세지의 처리 결과이며 Consumer가 Broker에게 알려준다.
 ACK는 처리 완료의 신호로 Broker는 해당 메세지를 삭제한다.
 NACK는 처리 실패의 신호로 재전송을 하거나 DLQ 로 보낸다.
+
+[ DLQ ( Dead Letter Queue ) ]
+DLQ는 처리 실패한 메세지의 보관소이며 처리 실패한 메세지를 분석할 용도로 사용한다.
+DLQ는 일반 Queue와는 다른 별도의 Queue이며, 운영자는 Queue안에 메세지를 Peek/Browse 방식으로 조회할 수 있다.
+# Peek/Browse 방식을 통해 큐 안에 몇번째 데이터를 조회할 수 있다.
+
+DLQ 메세지는 기본적으로 즉시 삭제되지 않으며, 보관 정책을 통해 일정 기간 유지시킬 수 있다. ( 7일 후 삭제 )
+DLQ 메세지는 다시 Consumer에게 전달할 수 있으며, Consumer가 ACK 신호를 전송하면 해당 메세지는 삭제된다.
+혹은 DLQ Size 를 제한하여 특정 용량을 넘을 경우 오래된 메세지부터 삭제하게 할 수 있다.
+
+# DLQ는 보통 Consumer에서 여러번 실패한 메세지, retry 초과, deserialize 실패 등의 사유로 메세지가 들어온다.
+
+[ Broker ]
+대표적인 MQ 중 RabbitMQ와 ActiveMQ , IBM MQ들의 Broker는 다음과 같은 역할을 수행한다.
+메세지 저장, 큐 상태 관리, Consumer 전달, Ack관리, 재전송/삭제, 장애 복구
+
+우선 Producer가 Broker로 메세지를 전달하면 Broker는 내부 Queue에 메세지를 저장한다.
 
 [ Queue 패턴 ]
 
