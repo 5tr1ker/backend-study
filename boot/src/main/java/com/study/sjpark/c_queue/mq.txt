@@ -159,33 +159,44 @@ Cluster는 여러 Broker 들을 하나의 MQ 시스템으로 묶은 논리적인
 5. 장애 감지 : Broker가 살아있는가
 6. Failover : 장애 승계
 
-- 장애 대응 ( 고가용성 )
-각각의 Broker들은 서로 다른 Broker의 Message를 복제하고 있으며, 특정 Broker에 장애가 발생하면
-해당 Broker의 메세지를 복제한 다른 Broker가 승계받아 서비스를 지속적으로 운영한다.
+- 장애 대응 ( 고가용성 ) 및 메세지 복제 ( Replication )
+메세지 혹은 Queue 데이터들을 여러 Broker에게 복제하여 장애에 대응한다.
+특정 Broker 에서 Leader 역할을 담당하던 Queue 혹은 Replica 에 장애가 발생하면, 복제본을 가지고 있는 다른 Broker 가
+Leader 로 승계하여 서비스를 지속적으로 운영할 수 있게 해준다.
+구체적인 복제 및 장애 대응 방법 ( Failover ) 은 MQ 제품마다 다르다.
 
 - 부하 분산 ( Scale-Out )
 Broker들은 트래픽을 나눠서 처리할 수 있다.
-예를 들어 Queue 를 분산하거나, Producer의 요청, Consumer의 연결을 분산하여 처리량을 증가 시킨다.
-
-- 메세지 복제 ( Replication )
-각 Broker에 저장된 Message를 다른 Broker에 복제하여, Broker 장애나 디스크 장애가 발생해도 복구가 가능하다.
+예를 들어 여러 Consumer 에게 메세지를 분산 처리하고, 여러 Broker에 Producer의 메세지 전송 요청과 Consumer의 연결을 분산하여 처리량과 확장성을
+향상 시킬 수 있다. 구체적인 부하 분산 방식은 MQ 제품마다 다르다.
 
 - MQ Cluster의 단점
 Cluster를 통해 이점도 있지만 단점도 존재한다.
 대표적으로 각각의 Broker들이 서로 Leader라고 주장하는 Split Brain 문제와 재전송과 복제 과정에서 동일한 메세지가 중복되어 전달될 수 있다.
 따라서 대부분의 MQ는 Exactly-Once 보다는 At-Least-Once 전달 보장만 한다.
 
-[ 메세지 분배 방법 ]
+[ Consumer 메세지 분배 방법 ( Dispatch ) ]
 하나의 큐에 대해 다수의 Consumer가 연결되어 있는 경우 하나의 메세지에 대해 하나의 Consumer만 처리하게 된다.
-이때 메세지를 분배하기 위한 방법으로는 Round-Robin 방법과 Prefetch 방법이 있다.
+이때 메세지를 전달하기 위한 방법으로는 Round-Robin 방법과 Prefetch 방법이 있다.
+
+메세지 분배 방식은 크게 Dispatch 와 Routing 으로 구분된다.
+Dispatch는 Broker가 Queue에 저장된 메세지를 Consumer들에게 전달하는 방법이며,
+Routing은 Exchange가 Producer 로 부터 받은 메세지를 어떤 Queue에 적제할 지 결정하는 방식이다.
 
 - Round-Robin
-여러 Consumer 들을 돌아가면서 순서대로 1개씩 분배한다.
+가장 단순한 분배 방법으로 Broker는 Queue에 있는 메세지를 Consumer 들에게 순서대로 분배한다.
+구현이 단순하고 균등하게 분배된다는 장점이 있지만, Consumer의 처리 속도을 고려하지 않는다는 단점이 있다.
 
-- Prefetch
-속도 기반 분배로 빨리 처리되는 Consumer에게 더 많은 메세지가 할당된다.
+- Prefetch ( Fair Dispatch )
+Consumer가 동시에 보유할 수 있는 미처리 메세지 수를 제한하는 방식이다.
+이를 통해 처리 속도가 빠른 Consumer에게 더 많은 메세지가 할당된다.
 
-- Broadcast ( Fan-Out )
+예를 들어 prefetch의 값이 3일 경우 Consumer는 속도에 관계 없이 최대 3개의 미처리 메세지만 가질 수 있다.
+Consumer는 메세지 처리를 완료한 후 ACK를 Broker에게 전달하면, 새로운 메세지를 할당받을 수 있다.
+이를 통해 실제 처리 속도에 따라 부하가 분산된다.
+
+해당 방식은 운영 및 튜닝 ( Prefetch 값 조정 )이 Round-Robin 보다 복잡하다는 단점을 가지고 있지만,
+Consumer 간 처리 속도에 차이가 있는 환경에서는 Round Robin 보다 높은 처리량을 가진다는 장점을 가지고 있다.
 
 [ 전통 MQ 특징 ]
 - Push 기반 모델
