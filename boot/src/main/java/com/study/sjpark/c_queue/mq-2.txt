@@ -1,0 +1,44 @@
+[ MQ의 종류 ]
+전통 MQ 에는 여러 오픈소스들이 존재한다. RabbitMQ와 ActiveMQ ( classic , Artemis ) , IBM MQ , TIBCO MQ , Amazon SQS 등이
+존재하지만 그 중에서 RabbitMQ 와 ArtemisMQ 를 많이 사용한다.
+ArtemisMQ는 ActiveMQ의 개선 버전으로 기존 성능 문제를 개선 시킨 차세대 MQ이다.
+
+[ RabbitMQ ]
+가장 많이 사용되고 있는 MQ 중 하나이다.
+업무 처리에 있어서 메세지 신뢰성이 높으며, 간편한 UI를 제공하여 MSA 아키텍쳐에서 쉽게 모니터링을 할 수 있다.
+
+RabbitMQ는 AMQP 프로토콜을 기반으로 Exchange -> Queue -> Consumer 구조로 구성된다.
+그렇기 때문에 Producer가 Message를 Broker에게 전달하면, Broker는 Queue에 Message를 저장하고 Consumer 에게 전달한다.
+
+- 다양한 라우팅
+RabbitMQ는 다양한 Exchange 를 제공하여 메세지를 원하는 Queue에 전달하거나, 여러 Queue에 복사하여 전달할 수 있다.
+Exchange 는 Direct , Topic , Fanout , Headers 방식을 제공하고 있다.
+
+- 운영을 위한 UI 제공
+큐 상태, Consumer 상태, 메세지 수, DLQ, Cluster 상태 등 현재 MQ 서버 내의 다양한 정보들을 UI로 간단하게 볼 수 있다.
+
+- 메세지 신뢰성
+RabbitMQ는 ACK, DLQ, Queue Durable , Persistent Message , Cluster Replication 등을 제공하여 메세지의 유실을 최소화 한다.
+특정 Broker나 Queue에 장애가 발생하여도 메세지를 복구할 수 있으며, 메세지가 최소 한번이라도 전달되는 At-Least-Once 를 보장한다.
+
+[ ArtemisMQ ]
+Apache에서 제공하는 차세대 ActiveMQ Broker이다.
+ArtemisMQ는 ActiveMQ Classic 의 성능 문제를 개선 시킨 후속 버전이다.
+
+ArtemisMQ는 운영과 학습 난이도가 RabbitMQ 보다 높지만, Java 와 호환성이 좋고 대규모 환경 및 성능이 우수하다는 특징을 가지고 있다.
+
+- 높은 성능
+ArtemisMQ는 고성능 Journal 을 활용하여 메세지를 디스크에 기록한다.
+이는 일반 적인 DB 와 RabbitMQ 보다 더 빠른 속도이다.
+
+- JMS 표준 지원
+JMS 표준을 지원하기 때문에 Java 기반 환경에서 높은 호환성을 가진다.
+
+- 다양한 프로토콜 지원
+ArtemisMQ는 다양한 프로토콜을 지원하고 있기 때문에 다양한 시스템들을 하나의 Broker에 연결할 수 있다.
+ArtemisMQ가 제공하는 프로토콜들은 AMQP, MQTT , STOMP , OpenWire , JMS 등이 있다.
+
+- 대규모 클러스터링
+Broker Cluster와 Replication, Fail Over , Broker-to-Broker 구성을 지원하기 때문에
+요청량이 많은 곳에서도 안정적으로 운영될 수 있다.
+
