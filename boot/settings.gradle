@@ -1,1 +1,4 @@
 rootProject.name = 'sjpark'
+
+include("modules:f_oracledb" ,
+        "modules:e_mongodb")
