@@ -79,11 +79,35 @@ db.COLLECTION_NAME.update({ 조건 } , { $set: { 수정할  필드.. } } , { 옵
 ex ) db.member.update({"age" : 25} , { $set: { "age" : 99 , "metadata" : "data" } })
 위의 내용은 age 가 25인 Document에 대해 age 를 99로 변경하고 metadata 라는 key를 추가하는 명령이다.
 기본적으로 조건에서 조회되는 첫번 째 Document만 수정이 된다. 즉, 조건에 맞는 Document 가 여러 개 일 경우에도 가장 첫번째 Document 만 수정된다.
+# 만약 $set 에 정의된 필드가 검색된 Document 에 없다면 필드를 추가한다.
+# 그리고 조건에 맞는 Document 가 없다면 어떠한 것도 Update 하지 않는다.
 
 옵션에 들어갈 수 있는 설정 값은 다음과 같다.
 upsert : 조건에 맞는 데이터가 없을 경우 insert 를 할 것인지에 대한 여부
 ex ) db.member.update({"age" : 1234} , { $set: { "age" : 12 , "metadata" : "data..." } } , { upsert : true })
+multi : update 대상이 여러 Document 일 경우 일괄 업데이트 ( 기본적으로 1개만 Update )
+ex ) db.member.update( {age : { $gt : 0 } } , { $set : { isDelete : false } } , { multi:true } )
+push : Document 내에 배열 타입의 fields에 새로운 요소 추가
+ex ) db.member.update({name : 'sjpark'} , { $push : { metadata : 'db:mongodb' } })
+pull : Document 내의 배열 타입의 fields에 해당 요소를 제거
+ex ) db.member.update({name : 'sjpark'} , { $pull : { metadata : 'db:mongodb' } })
 
+db.COLLECTION_NAME.updateOne : 조건에 맞는 Document 중 첫번째 Document만 Update
+ex ) db.member.updateOne({age : { $gt : 0 }} , { $set : { age: 26 } })
+db.COLLECTION_NAME.updateMany : 조건에 맞는 모든 Document 를 수정
+ex ) db.member.updateOne({age : { $gt : 0 }} , { $set : { age: 26 } })
+db.COLLECTION_NAME.replaceOne : 조건에 맞는 Document 중 첫번째 Document 를 해당 Document 도 치환
+ex ) db.member.updateOne({age : { $gt : 0 }} , { $set : { age: 26 } })
+
+db.COLLECTION_NAME.findAndModify : upsert 함수의 변형으로 수정된 Document 의 정보를 반환한다. ( 만약 조건이 없다면 아무런 동작도 하지 않는다. )
+이때 인자로 제공되어야 하는 설정 값은 다음과 같다. query : 검색 조건 , update : 수정할 데이터 , new : 반환 대상 ( true 는 수정된 Document , false는 수정 대상 Document )
+ex ) db.member.updateOne({age : { $gt : 0 }} , { $set : { age: 26 } })
+# findAndModify 는 1개의 Document만 수정할 수 있으며, update 함수와는 달리 수정된 Document 나 수정 대상 Document 를 가져올 수 있다.
+
+db.COLLECTION_NAME.findOneAndUpdate : findAndModify 에서 UPDATE 역할만 담당한다.
+ex ) db.member.findOneAndUpdate({name:'holdy'} , {$set : {'country' : 'USA'}} , { returnNewDocument : true })
+db.COLLECTION_NAME.findOneAndReplace : findAndModify 에서 ReplaceOne 역할만 담당한다.
+ex ) db.member.findOneAndReplace({name:'holdy'} , {'status' : 'disable'} , { returnNewDocument : true })
 
 - 데이터 삭제 ( Delete )
 
