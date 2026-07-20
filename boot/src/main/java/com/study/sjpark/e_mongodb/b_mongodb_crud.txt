@@ -119,3 +119,8 @@ db.COLLECTION_NAME.deleteOne() : 조건에 맞는 Document 중 첫번 째 Docume
 db.COLLECTION_NAME.deleteMany() : 조건에 맞는 모든 Document 삭제
 
 # remove() 명령은 기본적으로 다중 삭제이기 때문에, 보다 더 안전한 deleteOne() 과 deleteMany() 를 사용하는 것이 바람직 하다.
+
+- 페이징
+db.COLLECTION_NAME.find().limit(N) : 최대 N 개의 Documents 만 출력
+db.COLLECTION_NAME.find().skip(N) : N 개의 Document를 skip한 후 출력
+# 2개의 Document를 skip 시에 3번째 Document 부터 출력된다.

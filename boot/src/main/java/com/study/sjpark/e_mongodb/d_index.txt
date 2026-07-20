@@ -1,0 +1,40 @@
+
+[ 인덱스 ]
+
+- 인덱스 생성
+db.COLLECTION_NAME.createIndex({age:1})
+특정 컬렉션의 age 필드에 대해 인덱스를 블로킹 방식으로 생성한다.
+블로킹 방식이기 때문에 인덱스 생성이 완료될 때 까지 해당 컬렉션의 모든 CRUD는 블로킹 된다.
+이때 1은 오름차순, -1 은 내림차순으로 정렬된다.
+
+만약 논블로킹 방식으로 인덱스를 생성하고 싶다면 다음과 같이 두번 째 인자로 background 옵션을 준다.
+그렇게 되면 인덱스 생성이 진행 중이더라도 CRUD 가 가능하다.
+db.COLLECTION_NAME.createIndex({age:1} , {background:1})
+
+# Document 내의 _id 필드에는 자동으로 인덱스가 설정되어 있다.
+
+- 복합인덱스 생성
+db.COLLECTION_NAME.createIndex({age:1} , {count:1})
+인덱스는 2개 이상의 인덱스를 지정할 수 있다.
+물론 인덱스의 생성 순서에 따라 성능에 차이가 날 수 있으며, 두 번째 필드만 사용할 경우 인덱스를 사용할 수 없다.
+
+# db.collection.find({age:1} , {count:1}) 만약 age 와 count 가 서로 다른 인덱스라면, MongoDB 는 각각 다른 인덱스를 조합하여 조회한다.
+
+- 텍스트인덱스 생성
+db.COLLECTION_NAME.createIndex({name:"text"})
+인덱스 생성 시 value 값으로 text 를 입력하여 텍스트인덱스를 생성할 수 있다.
+이렇게 할 경우 $text 쿼리 연산자를 사용할 수 있다.
+{ $text: { $search: 문자, $language: 언어, $caseSensitive: 대소문자구별 } }
+
+- 인덱스 조회
+db.COLLECTION_NAME.getIndexes() : 생성된 인덱스들을 조회할 수 있다.
+
+- 인덱스 제거
+db.COLLECTION_NAME.dropIndex(인덱스 이름) : 특정 인덱스를 제거한다.
+db.COLLECTION_NAME.dropIndexes() : 모든 인덱스를 제거한다.
+
+- 인덱스 크기 확인
+db.COLLECTION_NAME.totalIndexSize() : 전체 인덱스 크기를 조회한다.
+
+MongoDB에서 인덱스는 하나당 작게는 16KB를 차지한다.
+그렇기 때문에 인덱스는 필요한 필드에만 생성하는 것이 좋다.
