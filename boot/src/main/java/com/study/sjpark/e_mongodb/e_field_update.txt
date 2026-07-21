@@ -1,0 +1,70 @@
+[ 필드 수정 연산자 ]
+Document 내에 있는 fields 를 수정하는 연산자들이다.
+
+- $inc : 필드 값을 증가시키거나 감소시키는 연산자이다. 양수이면 증가, 음수이면 감소이다.
+db.member.update({_id: ObjectId('6a577fdff8f609e553d7d0c2')} , { $inc: {age : 1} })
+
+- $mul : 필드 값을 곱하는 연산자이다.
+db.member.update({_id: ObjectId('6a577fdff8f609e553d7d0c2')} , { $mul: {age : 0.2} })
+
+- $replace : 특정 필드의 이름을 변경한다. 한번에 여러개의 필드를 수정할 수 있다.
+db.member.update({_id: ObjectId('6a577fdff8f609e553d7d0c2')} , { $rename: { howDelete : 'isDelete' , age : 'score'} })
+db.member.update({_id: ObjectId('6a577fdff8f609e553d7d0c2')} , { $rename: { score : 'age'} })
+
+- $set : 해당 필드의 값을 다른 값으로 대체한다.
+db.member.update({_id: ObjectId('6a577fdff8f609e553d7d0c2')} , {$set : {age : 31}})
+
+- $setOrInsert : $set 과 동일하지만, upsert 의 경우에만 동작한다.
+db.member.update({_id: ObjectId('6a577fdff8f609e553d7d0c2')} , { $setOnInsert : { age : 55 } } )
+
+- $unset : 특정 필드를 제거한다.
+db.member.update({age:12345} , {$unset : {newArray: '' , newField: ''}})
+
+- $min : 해당 필드의 값이 주어진 값보다 클 경우, 해당 값으로 변경한다.
+db.member.update({age:12345} , {$min: {age : 160}})
+# 만약 age 의 값이 200 일 경우 160으로 변경된다.
+
+- $max : 해당 필드의 값이 주어진 값보다 작을 경우, 해당 값으로 변경된다.
+db.member.update({age:160} , {$max: {age: 300}})
+# 만약 age 의 값이 160일 경우 300으로 변경된다.
+
+- $currentDate : 특정 필드를 현재 날짜로 변경한다. ( 날짜는 Date 타입과 timestamp 타입이 있다. )
+date 타입 : db.member.update({age:300} , { $currentDate : { dateNow : true } } )
+timestamp 타입 : db.member.update({age:300} , { $currentDate : { timestampNow : { $type: 'timestamp' } } })
+{
+  _id: ObjectId('6a5f68d40b5d2c786e0761f2'),
+  age: 300,
+  dateNow: 2026-07-21T12:58:37.600Z,
+  timestampNow: Timestamp({ t: 1784638790, i: 1 })
+}
+
+[ 배열 수정 연산자 ]
+
+- $ : 배열 내의 요소 위치를 저정하는 연산자이다.
+db.member.update({newArray:2} , {$set : { 'newArray.$' : 5 }})
+# newArray : [1,2,3] 의 값이 newArray : [1,5,3] 으로 변경된다.
+# 즉, 검색된 배열 내의 요소의 위치를 저장하는 연산자이다.
+
+- $addToSet : 배열 내의 요소를 추가한다. 만약 요소가 이미 존재한다면 추가하지 않는다.
+db.member.update({ age : 300 } , { $addToSet: { newArray : 2 } })
+
+- $pop : 배열의 맨 앞, 맨 뒤의 요소 1개를 제거한다.
+db.member.update({ age : 300 } , { $pop : { newArray : 1 } })
+# -1일 경우 맨 앞의 요소를, 1 일 경우 맨 뒤의 요소를 제거한다.
+
+- $pull : 배열 내의 요소 중에서 조건에 만족하는 요소를 제거한다.
+db.member.update({age:300} , {$pull : {newArray : {$gt:3}}})
+
+- $pullAll : 배열 내의 요소 중 특정 값을 제거한다.
+db.member.update({ age : 300 } , { $pullAll : { newArray : [5,3] } } )
+
+- $push : 배열 내에 요소를 삽입한다.
+db.member.update({ age : 300 } , { $push : {newArray : 1} } )
+
+- $each : 배열을 합칠 때 사용한다. ( 보통 $push 나 $addToSet 과 함께 사용된다. )
+db.member.update({ age : 300 } , { $push : {newArray : { $each : [3,4,5,6] }} } )
+# newArray 가 [1,2] 일 경우, [1,2,3,4,5,6] 이 된다.
+
+- $position : $push와 $each 와 함께 사용되며, 요소를 삽입할 위치를 지정한다.
+db.member.update({ age : 300 } , { $push : {newArray : { $each : ['element'] , $position:3 }} } )
+# 배열의 3번째 위치에 'element' 라는 요소를 삽입한다.
