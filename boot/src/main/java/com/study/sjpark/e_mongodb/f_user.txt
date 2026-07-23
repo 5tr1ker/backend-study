@@ -1,0 +1,24 @@
+[ 계정 관리 명령어 ]
+db.auth() : 사용자 인증
+ex ) db.auth('sjpark' ,'password')
+만약 사용자가 없거나 비밀번호가 다를 경우 Authentication failed 예외가 발생한다.
+
+db.createUser() : 사용자 생성
+ex ) db.createUser({user: "sjpark",pwd: "password",roles: [{ role: "read", db: "admin" },{ role: "readWrite", db: "studymg" }]})
+# admin DB에서는 read 권한을 부여하고, studymg DB에서는 조회 및 쓰기 권한을 가지는 sjpark 계정 생성
+
+db.updateUser() : 유저 정보 수정
+
+db.changeUserPassword() : 사용자 비밀번호 변경
+
+db.dropAllUsers() : 모든 사용자 제거
+
+db.dropUser() : 특정 사용자 제거
+
+db.grantRolesToUser() : 특정 사용자에게 권한 부여
+
+db.revokeRolesFromUser() : 특정 사용자에게 권한을 회수
+
+db.getUser() : 특정 사용자의 정보 조회
+
+db.getUsers() / show users : 모든 사용자 정보를 조회
